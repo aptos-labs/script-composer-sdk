@@ -21,7 +21,7 @@
     "build": "tsup --config tsup.config.ts",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "prepublish": "build"
+    "prepublish": "pnpm build"
   },
   "keywords": [],
   "author": "",
