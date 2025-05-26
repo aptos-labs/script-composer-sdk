@@ -1,4 +1,4 @@
-import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes } from "@aptos-labs/ts-sdk";
+import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer } from "@aptos-labs/ts-sdk";
 import { initSync, TransactionComposer, ScriptComposerWasm, CallArgument} from "@aptos-labs/script-composer-pack";
 
 export type InputBatchedFunctionData = {
@@ -89,5 +89,9 @@ export class AptosScriptComposer {
 
   build(): Uint8Array {
     return this.builder.generate_batched_calls(true);
+  }
+
+  build_payload(): TransactionPayloadScript {
+    return TransactionPayloadScript.load(new Deserializer(this.build()));
   }
 }
