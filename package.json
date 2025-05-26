@@ -6,9 +6,10 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
+      
     },
     "./package.json": "./package.json"
   },
@@ -19,7 +20,8 @@
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "prepublish": "build"
   },
   "keywords": [],
   "author": "",
