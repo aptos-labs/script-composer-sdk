@@ -1,4 +1,4 @@
-import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer } from "@aptos-labs/ts-sdk";
+import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer, AccountAddressInput, InputGenerateTransactionOptions, generateRawTransaction, AccountAddress, SimpleTransaction } from "@aptos-labs/ts-sdk";
 import { initSync, TransactionComposer, ScriptComposerWasm, CallArgument} from "@aptos-labs/script-composer-pack";
 
 export type InputBatchedFunctionData = {
@@ -94,4 +94,24 @@ export class AptosScriptComposer {
   build_payload(): TransactionPayloadScript {
     return TransactionPayloadScript.load(new Deserializer(this.build()));
   }
+}
+
+
+export async function BuildScriptComposerTransaction(
+  args: {
+    sender: AccountAddressInput;
+    builder: (builder: AptosScriptComposer) => Promise<AptosScriptComposer>;
+    aptosConfig: AptosConfig;
+    options?: InputGenerateTransactionOptions;
+    withFeePayer?: boolean;
+  }
+): Promise<SimpleTransaction> {
+  const composer = new AptosScriptComposer(args.aptosConfig);
+  const builder = await args.builder(composer);
+  const bytes = builder.build();
+  const rawTxn = await generateRawTransaction({
+    payload: TransactionPayloadScript.load(new Deserializer(bytes)),
+    ...args,
+  });
+  return new SimpleTransaction(rawTxn, args.withFeePayer === true ? AccountAddress.ZERO : undefined);
 }
