@@ -1,11 +1,12 @@
-import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer, AccountAddressInput, InputGenerateTransactionOptions, generateRawTransaction, AccountAddress, SimpleTransaction } from "@aptos-labs/ts-sdk";
-import { initSync, TransactionComposer, ScriptComposerWasm, CallArgument} from "@aptos-labs/script-composer-pack";
+import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer, AccountAddressInput, InputGenerateTransactionOptions, generateRawTransaction, AccountAddress, SimpleTransaction, MoveModuleBytecode, Hex } from "@aptos-labs/ts-sdk";
+import { initSync, TransactionComposer, wasmModule, CallArgument} from "@aptos-labs/script-composer-pack";
 
 export type InputBatchedFunctionData = {
   function: MoveFunctionId;
   typeArguments?: Array<TypeArgument>;
   functionArguments: Array<EntryFunctionArgumentTypes | CallArgument | SimpleEntryFunctionArgumentTypes>;
-  module?: MoveModule;
+  moduleAbi: MoveModule;
+  moduleBytecodes?: string[];
 };
 
 export class AptosScriptComposer {
@@ -18,13 +19,14 @@ export class AptosScriptComposer {
   constructor(aptosConfig: AptosConfig) {
     this.config = aptosConfig;
      if (!AptosScriptComposer.transactionComposer) {
-      if (!ScriptComposerWasm.isInitialized) {
-        ScriptComposerWasm.init();
-      }
-      initSync({ module: ScriptComposerWasm.wasm });
+      initSync({ module: wasmModule });
       AptosScriptComposer.transactionComposer = TransactionComposer;
      }
      this.builder = AptosScriptComposer.transactionComposer.single_signer();
+  }
+
+  storeModule(module: MoveModuleBytecode) {
+    this.builder.store_module(Hex.fromHexInput(module.bytecode).toUint8Array());
   }
 
   // Add a move function invocation to the TransactionComposer.
@@ -36,18 +38,19 @@ export class AptosScriptComposer {
   // The function would also return a list of `CallArgument` that can be passed on to future calls.
   async addBatchedCalls(input: InputBatchedFunctionData): Promise<CallArgument[]> {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
-    const module = input.module;
-    const nodeUrl = this.config.getRequestUrl(AptosApiType.FULLNODE);
+    const module = input.moduleAbi;
+    const moduleBytecode = input.moduleBytecodes;
+    
+    moduleBytecode?.forEach((module)=>{
+      this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
+    });
 
-    // Load the calling module into the builder.
-    await this.builder.load_module(nodeUrl, `${moduleAddress}::${moduleName}`);
-
-    // Load the calling type arguments into the loader.
     if (input.typeArguments !== undefined) {
       for (const typeArgument of input.typeArguments) {
-        await this.builder.load_type_tag(nodeUrl, typeArgument.toString());
+        
       }
     }
+
     const typeArguments = standardizeTypeTags(input.typeArguments);
     let moduleAbi: MoveModule | undefined = undefined;
     if (!module) {

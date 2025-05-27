@@ -34,7 +34,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
   "peerDependencies": {
-    "@aptos-labs/script-composer-pack": "^0.0.9",
+    "@aptos-labs/script-composer-pack": "^0.0.10-0",
     "@aptos-labs/ts-sdk": "^2.0.1"
   },
   "devDependencies": {
