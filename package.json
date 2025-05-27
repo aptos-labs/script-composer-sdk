@@ -1,6 +1,6 @@
 {
   "name": "script-composer-sdk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "./dist/index.mjs",
   "type": "module",
