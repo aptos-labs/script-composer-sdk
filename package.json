@@ -1,45 +1,14 @@
 {
-  "name": "script-composer-sdk",
-  "version": "0.0.6",
-  "description": "",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "package.json"
-  ],
+  "name": "script-composer-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Script Composer SDK and Examples",
   "scripts": {
-    "build": "tsup --config tsup.config.ts",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "prepublish": "pnpm build"
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.11.0",
-  "peerDependencies": {
-    "@aptos-labs/script-composer-pack": "^0.0.10-0",
-    "@aptos-labs/ts-sdk": "^2.0.1"
-  },
-  "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
-  }
+  "packageManager": "pnpm@10.11.0"
 }
