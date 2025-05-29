@@ -27,18 +27,29 @@
     "build": "tsup --config tsup.config.ts",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "prepublish": "pnpm build"
+    "prepublish": "pnpm build",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "fmt": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "fmt:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "@aptos-labs/script-composer-pack": "^0.0.10-0",
-    "@aptos-labs/ts-sdk": "^2.0.1"
+    "@aptos-labs/script-composer-pack": "0.0.10-0",
+    "@aptos-labs/ts-sdk": "2.0.1"
   },
   "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "@eslint/js": "9.27.0",
+    "@typescript-eslint/eslint-plugin": "8.33.0",
+    "@typescript-eslint/parser": "8.33.0",
+    "eslint": "9.27.0",
+    "eslint-config-prettier": "10.1.5",
+    "eslint-plugin-prettier": "5.4.0",
+    "prettier": "3.5.3",
+    "tsup": "8.5.0",
+    "typescript": "5.8.3",
+    "vitest": "3.1.4"
   }
-} 
+}
