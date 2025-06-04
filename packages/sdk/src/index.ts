@@ -26,6 +26,8 @@ import {
   CallArgument,
 } from '@aptos-labs/script-composer-pack';
 
+export * from '@aptos-labs/script-composer-pack';
+
 export type InputBatchedFunctionData = {
   function: MoveFunctionId;
   typeArguments?: Array<TypeArgument>;
