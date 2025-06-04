@@ -1,0 +1,19 @@
+{
+  "name": "example-nodejs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@aptos-labs/script-composer-pack": "^0.0.10-0",
+    "@aptos-labs/ts-sdk": "^2.0.1",
+    "script-composer-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}

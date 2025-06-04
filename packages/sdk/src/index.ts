@@ -1,11 +1,41 @@
-import { AptosConfig, getFunctionParts, AptosApiType, standardizeTypeTags, fetchModuleAbi, convertArgument, MoveFunctionId, TypeArgument, EntryFunctionArgumentTypes, MoveModule, SimpleEntryFunctionArgumentTypes, TransactionPayloadScript, Deserializer, AccountAddressInput, InputGenerateTransactionOptions, generateRawTransaction, AccountAddress, SimpleTransaction } from "@aptos-labs/ts-sdk";
-import { initSync, TransactionComposer, ScriptComposerWasm, CallArgument} from "@aptos-labs/script-composer-pack";
+import {
+  AptosConfig,
+  getFunctionParts,
+  standardizeTypeTags,
+  fetchModuleAbi,
+  convertArgument,
+  MoveFunctionId,
+  TypeArgument,
+  EntryFunctionArgumentTypes,
+  MoveModule,
+  SimpleEntryFunctionArgumentTypes,
+  TransactionPayloadScript,
+  Deserializer,
+  AccountAddressInput,
+  InputGenerateTransactionOptions,
+  generateRawTransaction,
+  AccountAddress,
+  SimpleTransaction,
+  MoveModuleBytecode,
+  Hex,
+} from '@aptos-labs/ts-sdk';
+import {
+  initSync,
+  TransactionComposer,
+  wasmModule,
+  CallArgument,
+} from '@aptos-labs/script-composer-pack';
+
+export * from '@aptos-labs/script-composer-pack';
 
 export type InputBatchedFunctionData = {
   function: MoveFunctionId;
   typeArguments?: Array<TypeArgument>;
-  functionArguments: Array<EntryFunctionArgumentTypes | CallArgument | SimpleEntryFunctionArgumentTypes>;
-  module?: MoveModule;
+  functionArguments: Array<
+    EntryFunctionArgumentTypes | CallArgument | SimpleEntryFunctionArgumentTypes
+  >;
+  moduleAbi: MoveModule;
+  moduleBytecodes?: string[];
 };
 
 export class AptosScriptComposer {
@@ -13,18 +43,19 @@ export class AptosScriptComposer {
 
   private builder: TransactionComposer;
 
-  private static transactionComposer?: any;
+  private static transactionComposer?: typeof TransactionComposer;
 
   constructor(aptosConfig: AptosConfig) {
     this.config = aptosConfig;
-     if (!AptosScriptComposer.transactionComposer) {
-      if (!ScriptComposerWasm.isInitialized) {
-        ScriptComposerWasm.init();
-      }
-      initSync({ module: ScriptComposerWasm.wasm });
+    if (!AptosScriptComposer.transactionComposer) {
+      initSync({ module: wasmModule });
       AptosScriptComposer.transactionComposer = TransactionComposer;
-     }
-     this.builder = AptosScriptComposer.transactionComposer.single_signer();
+    }
+    this.builder = AptosScriptComposer.transactionComposer.single_signer();
+  }
+
+  storeModule(module: MoveModuleBytecode) {
+    this.builder.store_module(Hex.fromHexInput(module.bytecode).toUint8Array());
   }
 
   // Add a move function invocation to the TransactionComposer.
@@ -36,18 +67,18 @@ export class AptosScriptComposer {
   // The function would also return a list of `CallArgument` that can be passed on to future calls.
   async addBatchedCalls(input: InputBatchedFunctionData): Promise<CallArgument[]> {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
-    const module = input.module;
-    const nodeUrl = this.config.getRequestUrl(AptosApiType.FULLNODE);
+    const module = input.moduleAbi;
+    const moduleBytecode = input.moduleBytecodes;
 
-    // Load the calling module into the builder.
-    await this.builder.load_module(nodeUrl, `${moduleAddress}::${moduleName}`);
+    moduleBytecode?.forEach((module) => {
+      this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
+    });
 
-    // Load the calling type arguments into the loader.
-    if (input.typeArguments !== undefined) {
-      for (const typeArgument of input.typeArguments) {
-        await this.builder.load_type_tag(nodeUrl, typeArgument.toString());
-      }
-    }
+    // if (input.typeArguments !== undefined) {
+    //   for (const typeArgument of input.typeArguments) {
+    //   }
+    // }
+
     const typeArguments = standardizeTypeTags(input.typeArguments);
     let moduleAbi: MoveModule | undefined = undefined;
     if (!module) {
@@ -55,19 +86,21 @@ export class AptosScriptComposer {
       if (!moduleAbi) {
         throw new Error(`Could not find module ABI for '${moduleAddress}::${moduleName}'`);
       }
-    }else {
+    } else {
       moduleAbi = module;
     }
 
     // Check the type argument count against the ABI
     const functionAbi = moduleAbi.exposed_functions.find((func) => func.name === functionName);
     if (!functionAbi) {
-      throw new Error(`Could not find function ABI for '${moduleAddress}::${moduleName}::${functionName}'`);
+      throw new Error(
+        `Could not find function ABI for '${moduleAddress}::${moduleName}::${functionName}'`
+      );
     }
-    
+
     if (typeArguments.length !== functionAbi.generic_type_params.length) {
       throw new Error(
-        `Type argument count mismatch, expected ${functionAbi?.generic_type_params.length}, received ${typeArguments.length}`,
+        `Type argument count mismatch, expected ${functionAbi?.generic_type_params.length}, received ${typeArguments.length}`
       );
     }
 
@@ -75,15 +108,17 @@ export class AptosScriptComposer {
       arg instanceof CallArgument
         ? arg
         : CallArgument.newBytes(
-            convertArgument(functionName, moduleAbi, arg, i, typeArguments, { allowUnknownStructs: true }).bcsToBytes(),
-          ),
+            convertArgument(functionName, moduleAbi, arg, i, typeArguments, {
+              allowUnknownStructs: true,
+            }).bcsToBytes()
+          )
     );
 
     return this.builder.add_batched_call(
       `${moduleAddress}::${moduleName}`,
       functionName,
       typeArguments.map((arg) => arg.toString()),
-      functionArguments,
+      functionArguments
     );
   }
 
@@ -96,16 +131,13 @@ export class AptosScriptComposer {
   }
 }
 
-
-export async function BuildScriptComposerTransaction(
-  args: {
-    sender: AccountAddressInput;
-    builder: (builder: AptosScriptComposer) => Promise<AptosScriptComposer>;
-    aptosConfig: AptosConfig;
-    options?: InputGenerateTransactionOptions;
-    withFeePayer?: boolean;
-  }
-): Promise<SimpleTransaction> {
+export async function BuildScriptComposerTransaction(args: {
+  sender: AccountAddressInput;
+  builder: (builder: AptosScriptComposer) => Promise<AptosScriptComposer>;
+  aptosConfig: AptosConfig;
+  options?: InputGenerateTransactionOptions;
+  withFeePayer?: boolean;
+}): Promise<SimpleTransaction> {
   const composer = new AptosScriptComposer(args.aptosConfig);
   const builder = await args.builder(composer);
   const bytes = builder.build();
@@ -113,5 +145,8 @@ export async function BuildScriptComposerTransaction(
     payload: TransactionPayloadScript.load(new Deserializer(bytes)),
     ...args,
   });
-  return new SimpleTransaction(rawTxn, args.withFeePayer === true ? AccountAddress.ZERO : undefined);
+  return new SimpleTransaction(
+    rawTxn,
+    args.withFeePayer === true ? AccountAddress.ZERO : undefined
+  );
 }
