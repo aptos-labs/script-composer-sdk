@@ -18,6 +18,12 @@ import {
   SimpleTransaction,
   MoveModuleBytecode,
   Hex,
+  TypeTag,
+  StructTag,
+  TypeTagStruct,
+  parseTypeTag,
+  LedgerVersionArg,
+  getAptosFullNode,
 } from '@aptos-labs/ts-sdk';
 import {
   initSync,
@@ -36,6 +42,9 @@ export type InputBatchedFunctionData = {
   >;
   moduleAbi: MoveModule;
   moduleBytecodes?: string[];
+  options?: {
+    allowFetch?: boolean;
+  }
 };
 
 export class AptosScriptComposer {
@@ -44,6 +53,10 @@ export class AptosScriptComposer {
   private builder: TransactionComposer;
 
   private static transactionComposer?: typeof TransactionComposer;
+
+  private static loadedModulesCache: Map<string, MoveModuleBytecode> = new Map();
+  
+  private storedModulesMap: Set<string> = new Set();
 
   constructor(aptosConfig: AptosConfig) {
     this.config = aptosConfig;
@@ -54,7 +67,18 @@ export class AptosScriptComposer {
     this.builder = AptosScriptComposer.transactionComposer.single_signer();
   }
 
-  storeModule(module: MoveModuleBytecode) {
+  storeModule(module: MoveModuleBytecode, moduleName?: string): void {
+    if (!moduleName && !module.abi) throw new Error('Module ABI is not supported in this context');
+    const moduleId = moduleName? moduleName : `${module.abi?.address}::${module.abi?.name}`;
+    if (moduleId && !AptosScriptComposer.loadedModulesCache.has(moduleId)) {
+      AptosScriptComposer.loadedModulesCache.set(moduleId, module);
+    }
+    if (moduleId && this.storedModulesMap.has(moduleId)) {
+      return;
+    }
+    if (moduleId) {
+      this.storedModulesMap.add(moduleId);
+    }
     this.builder.store_module(Hex.fromHexInput(module.bytecode).toUint8Array());
   }
 
@@ -74,10 +98,51 @@ export class AptosScriptComposer {
       this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
     });
 
-    // if (input.typeArguments !== undefined) {
-    //   for (const typeArgument of input.typeArguments) {
-    //   }
-    // }
+    if (!AptosScriptComposer.loadedModulesCache.has(`${moduleAddress}::${moduleName}`)) {
+       if (input.options?.allowFetch) {
+        // If the module is not loaded, we can fetch it.
+        const moduleBytecode = await getModuleInner({
+          aptosConfig: this.config,
+          accountAddress: moduleAddress,
+          moduleName: moduleName.toString(),
+        });
+        if (moduleBytecode) {
+          this.storeModule(moduleBytecode, `${moduleAddress}::${moduleName}`);
+        } else {
+          throw new Error(
+            `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
+          );
+        }
+       }else{
+        throw new Error(
+          `Module '${moduleAddress}::${moduleName}' is not loaded in the cache. Please load it before using it in a batched call.`
+        );
+       }
+    }
+
+    if (input.typeArguments !== undefined) {
+      for (const typeArgument of input.typeArguments) {
+        const type_tag = parseTypeTag(typeArgument.toString());
+        const requiredModules = await this.collectRequiredModulesFromTypeTag(type_tag, input.options);
+        requiredModules.forEach((moduleId) => {
+          if (!AptosScriptComposer.loadedModulesCache.has(moduleId)) {
+            throw new Error(
+              `Module '${moduleId}' is not loaded in the cache. Please load it before using\nit in a batched call.`
+            );
+          }
+          if (!this.storedModulesMap.has(moduleId)) {
+            const moduleBytecode = AptosScriptComposer.loadedModulesCache.get(moduleId);
+            if (moduleBytecode) {
+              this.storeModule(moduleBytecode, moduleId);
+            }else{
+              throw new Error(
+                `Module '${moduleId}' could not be found in the cache. Please ensure it is loaded.`
+              );
+            }
+          }
+        });
+      }
+    }
 
     const typeArguments = standardizeTypeTags(input.typeArguments);
     let moduleAbi: MoveModule | undefined = undefined;
@@ -122,6 +187,61 @@ export class AptosScriptComposer {
     );
   }
 
+
+  /**
+   * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are present in the cache.
+   * If allowFetch is true, missing modules will be fetched from the chain and added to the cache.
+   *
+   * @param typeTag - The TypeTag to analyze (can be struct, vector, etc.).
+   * @param options - Optional object. If options.allowFetch is true, missing modules will be fetched from the chain.
+   * @returns Promise<Set<string>> - A set of all module IDs (address::moduleName) required by the typeTag and its nested type arguments.
+   * @throws Error if a required module is missing and allowFetch is false, or if fetching fails.
+   */
+  async collectRequiredModulesFromTypeTag(
+    typeTag: TypeTag,
+    options?: { allowFetch?: boolean }
+  ): Promise<Set<string>> {
+  const modules = new Set<string>();
+  if (typeTag.isStruct()) {
+    const structTag = typeTag as TypeTagStruct;
+    const moduleId = `${structTag.value.address}::${structTag.value.moduleName}`;
+    modules.add(moduleId);
+    if( !AptosScriptComposer.loadedModulesCache.has(moduleId) ) {
+      if (options?.allowFetch) {
+        // If the module is not loaded, we can fetch it.
+        const module = await getModuleInner({
+          aptosConfig: this.config,
+          accountAddress: structTag.value.address,
+          moduleName: structTag.value.moduleName.toString(),
+        });
+        if (module) {
+          this.storeModule(module, moduleId);
+        }else{
+          throw new Error(
+            `Module '${moduleId}' could not be fetched. Please ensure it exists on the chain.`
+          );
+        }
+      }else{
+        throw new Error(
+          `Module '${moduleId}' is not loaded in the cache. Please load it before using it in a batched call.`
+        );
+      }
+    };
+    for (const ty of structTag.value.typeArgs) {
+      const result = await this.collectRequiredModulesFromTypeTag(ty, options);
+      for (const module of result) {
+        modules.add(module);
+      }
+    }
+  } else if (typeTag.isVector()) {
+      const result = await this.collectRequiredModulesFromTypeTag(typeTag.value, options);
+      for (const module of result) {
+        modules.add(module);
+      }
+  }
+  return modules;
+}
+
   build(): Uint8Array {
     return this.builder.generate_batched_calls(true);
   }
@@ -149,4 +269,21 @@ export async function BuildScriptComposerTransaction(args: {
     rawTxn,
     args.withFeePayer === true ? AccountAddress.ZERO : undefined
   );
+}
+
+async function getModuleInner(args: {
+  aptosConfig: AptosConfig;
+  accountAddress: AccountAddressInput;
+  moduleName: string;
+  options?: LedgerVersionArg;
+}): Promise<MoveModuleBytecode> {
+  const { aptosConfig, accountAddress, moduleName, options } = args;
+
+  const { data } =  await getAptosFullNode<{}, MoveModuleBytecode>({
+    aptosConfig,
+    originMethod: 'getModule',
+    path: `accounts/${AccountAddress.from(accountAddress).toString()}/module/${moduleName}`,
+    params: { ledger_version: options?.ledgerVersion },
+  });
+  return data;
 }
