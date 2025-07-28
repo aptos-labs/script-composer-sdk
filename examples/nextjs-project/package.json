@@ -9,13 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aptos-labs/script-composer-pack": "^0.0.10-0",
-    "@aptos-labs/ts-sdk": "^2.0.1",
-    "@keyv/memcache": "^2.0.1",
+    "@aptos-labs/script-composer-sdk": "workspace:*",
+    "@aptos-labs/ts-sdk": "^3.1.3",
+    "@keyv/offline": "^4.0.2",
     "next": "15.3.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "script-composer-sdk": "workspace:*"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

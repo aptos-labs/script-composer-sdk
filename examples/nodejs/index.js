@@ -1,18 +1,5 @@
-import { BuildScriptComposerTransaction } from 'script-composer-sdk';
-import { AptosConfig, Network, getAptosFullNode, AccountAddress, Aptos } from "@aptos-labs/ts-sdk"
-import { CallArgument } from '@aptos-labs/script-composer-pack';
-
-async function getModuleInner(args) {
-  const { aptosConfig, accountAddress, moduleName, options } = args;
-
-  const { data } =  await getAptosFullNode({
-    aptosConfig,
-    originMethod: 'getModule',
-    path: `accounts/${AccountAddress.from(accountAddress).toString()}/module/${moduleName}`,
-    params: { ledger_version: options?.ledgerVersion },
-  });
-  return data;
-}
+import { BuildScriptComposerTransaction, CallArgument, getModuleInner } from '@aptos-labs/script-composer-sdk';
+import { AptosConfig, Network, Aptos } from "@aptos-labs/ts-sdk"
 
 // Example using local cache
 async function mainWithCache() {
@@ -44,9 +31,9 @@ async function mainWithCache() {
     }),
    });
 
-   const aptos = new Aptos({
+   const aptos = new Aptos(new AptosConfig({
     network: Network.TESTNET,
-   })
+   }));
 
    const simulate_result = await aptos.transaction.simulate.simple({
     transaction: tx,
@@ -81,9 +68,9 @@ async function mainWithFetch() {
     }),
    });
 
-   const aptos = new Aptos({
+   const aptos = new Aptos(new AptosConfig({
     network: Network.TESTNET,
-   })
+   }));
 
    const simulate_result = await aptos.transaction.simulate.simple({
     transaction: tx,

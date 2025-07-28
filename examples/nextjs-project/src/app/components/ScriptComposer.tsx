@@ -1,26 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CallArgument } from '@aptos-labs/script-composer-pack';
-import { getAptosFullNode, AccountAddress, AptosConfig, Network, Aptos, type AccountAddressInput, type LedgerVersionArg, type MoveModuleBytecode } from '@aptos-labs/ts-sdk';
-import { AptosScriptComposer, BuildScriptComposerTransaction } from "script-composer-sdk";
-
-async function getModuleInner(args: {
-  aptosConfig: AptosConfig;
-  accountAddress: AccountAddressInput;
-  moduleName: string;
-  options?: LedgerVersionArg;
-}): Promise<MoveModuleBytecode> {
-  const { aptosConfig, accountAddress, moduleName, options } = args;
-
-  const { data } = await getAptosFullNode<object, MoveModuleBytecode>({
-    aptosConfig,
-    originMethod: 'getModule',
-    path: `accounts/${AccountAddress.from(accountAddress).toString()}/module/${moduleName}`,
-    params: { ledger_version: options?.ledgerVersion },
-  });
-  return data;
-}
+import { AptosConfig, Network, Aptos } from '@aptos-labs/ts-sdk';
+import { AptosScriptComposer, BuildScriptComposerTransaction, CallArgument, getModuleInner } from "@aptos-labs/script-composer-sdk";
 
 export default function ScriptComposer() {
   const [showModal, setShowModal] = useState(false);
