@@ -270,8 +270,8 @@ export async function BuildScriptComposerTransaction(args: {
     args.withFeePayer === true ? AccountAddress.ZERO : undefined
   );
 }
-
-async function getModuleInner(args: {
+ 
+export async function getModuleInner(args: {
   aptosConfig: AptosConfig;
   accountAddress: AccountAddressInput;
   moduleName: string;
