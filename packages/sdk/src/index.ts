@@ -19,7 +19,6 @@ import {
   MoveModuleBytecode,
   Hex,
   TypeTag,
-  StructTag,
   TypeTagStruct,
   parseTypeTag,
   LedgerVersionArg,
