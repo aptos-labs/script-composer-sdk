@@ -24,7 +24,7 @@ npm install
 To run the example:
 
 ```bash
-node index.js
+tsx index.ts
 ```
 
 ## What This Example Does
@@ -42,7 +42,7 @@ The example specifically:
 
 ## Code Structure
 
-- `index.js`: Contains the main example code
+- `index.ts`: Contains the main example code
 - `package.json`: Defines project dependencies
 
 ## Dependencies
