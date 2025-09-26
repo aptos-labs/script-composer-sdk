@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "tsx index.js",
-    "dev": "tsx watch index.js"
+    "start": "tsx index.ts",
+    "dev": "tsx watch index.ts"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^5.1.0",
