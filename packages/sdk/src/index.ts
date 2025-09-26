@@ -204,7 +204,7 @@ export class AptosScriptComposer {
   const modules = new Set<string>();
   if (typeTag.isStruct()) {
     const structTag = typeTag as TypeTagStruct;
-    const moduleId = `${structTag.value.address}::${structTag.value.moduleName}`;
+    const moduleId = `${structTag.value.address}::${structTag.value.moduleName.identifier.toString()}`;
     modules.add(moduleId);
     if( !AptosScriptComposer.loadedModulesCache.has(moduleId) ) {
       if (options?.allowFetch) {
@@ -212,7 +212,7 @@ export class AptosScriptComposer {
         const module = await getModuleInner({
           aptosConfig: this.config,
           accountAddress: structTag.value.address,
-          moduleName: structTag.value.moduleName.toString(),
+          moduleName: structTag.value.moduleName.identifier.toString(),
         });
         if (module) {
           this.storeModule(module, moduleId);
