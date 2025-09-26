@@ -44,7 +44,7 @@ export type InputBatchedFunctionData = {
   moduleBytecodes?: string[];
   options?: {
     allowFetch?: boolean;
-  }
+  };
 };
 
 export class AptosScriptComposer {
@@ -55,7 +55,7 @@ export class AptosScriptComposer {
   private static transactionComposer?: typeof TransactionComposer;
 
   private static loadedModulesCache: Map<string, MoveModuleBytecode> = new Map();
-  
+
   private storedModulesMap: Set<string> = new Set();
 
   constructor(aptosConfig: AptosConfig) {
@@ -69,7 +69,7 @@ export class AptosScriptComposer {
 
   storeModule(module: MoveModuleBytecode, moduleName?: string): void {
     if (!moduleName && !module.abi) throw new Error('Module ABI is not supported in this context');
-    const moduleId = moduleName? moduleName : `${module.abi?.address}::${module.abi?.name}`;
+    const moduleId = moduleName ? moduleName : `${module.abi?.address}::${module.abi?.name}`;
     if (moduleId && !AptosScriptComposer.loadedModulesCache.has(moduleId)) {
       AptosScriptComposer.loadedModulesCache.set(moduleId, module);
     }
@@ -99,7 +99,7 @@ export class AptosScriptComposer {
     });
 
     if (!AptosScriptComposer.loadedModulesCache.has(`${moduleAddress}::${moduleName}`)) {
-       if (input.options?.allowFetch) {
+      if (input.options?.allowFetch) {
         // If the module is not loaded, we can fetch it.
         const moduleBytecode = await getModuleInner({
           aptosConfig: this.config,
@@ -113,17 +113,20 @@ export class AptosScriptComposer {
             `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
           );
         }
-       }else{
+      } else {
         throw new Error(
           `Module '${moduleAddress}::${moduleName}' is not loaded in the cache. Please load it before using it in a batched call.`
         );
-       }
+      }
     }
 
     if (input.typeArguments !== undefined) {
       for (const typeArgument of input.typeArguments) {
         const type_tag = parseTypeTag(typeArgument.toString());
-        const requiredModules = await this.collectRequiredModulesFromTypeTag(type_tag, input.options);
+        const requiredModules = await this.collectRequiredModulesFromTypeTag(
+          type_tag,
+          input.options
+        );
         requiredModules.forEach((moduleId) => {
           if (!AptosScriptComposer.loadedModulesCache.has(moduleId)) {
             throw new Error(
@@ -134,7 +137,7 @@ export class AptosScriptComposer {
             const moduleBytecode = AptosScriptComposer.loadedModulesCache.get(moduleId);
             if (moduleBytecode) {
               this.storeModule(moduleBytecode, moduleId);
-            }else{
+            } else {
               throw new Error(
                 `Module '${moduleId}' could not be found in the cache. Please ensure it is loaded.`
               );
@@ -187,7 +190,6 @@ export class AptosScriptComposer {
     );
   }
 
-
   /**
    * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are present in the cache.
    * If allowFetch is true, missing modules will be fetched from the chain and added to the cache.
@@ -201,46 +203,46 @@ export class AptosScriptComposer {
     typeTag: TypeTag,
     options?: { allowFetch?: boolean }
   ): Promise<Set<string>> {
-  const modules = new Set<string>();
-  if (typeTag.isStruct()) {
-    const structTag = typeTag as TypeTagStruct;
-    const moduleId = `${structTag.value.address}::${structTag.value.moduleName.identifier.toString()}`;
-    modules.add(moduleId);
-    if( !AptosScriptComposer.loadedModulesCache.has(moduleId) ) {
-      if (options?.allowFetch) {
-        // If the module is not loaded, we can fetch it.
-        const module = await getModuleInner({
-          aptosConfig: this.config,
-          accountAddress: structTag.value.address,
-          moduleName: structTag.value.moduleName.identifier.toString(),
-        });
-        if (module) {
-          this.storeModule(module, moduleId);
-        }else{
+    const modules = new Set<string>();
+    if (typeTag.isStruct()) {
+      const structTag = typeTag as TypeTagStruct;
+      const moduleId = `${structTag.value.address}::${structTag.value.moduleName.identifier.toString()}`;
+      modules.add(moduleId);
+      if (!AptosScriptComposer.loadedModulesCache.has(moduleId)) {
+        if (options?.allowFetch) {
+          // If the module is not loaded, we can fetch it.
+          const module = await getModuleInner({
+            aptosConfig: this.config,
+            accountAddress: structTag.value.address,
+            moduleName: structTag.value.moduleName.identifier.toString(),
+          });
+          if (module) {
+            this.storeModule(module, moduleId);
+          } else {
+            throw new Error(
+              `Module '${moduleId}' could not be fetched. Please ensure it exists on the chain.`
+            );
+          }
+        } else {
           throw new Error(
-            `Module '${moduleId}' could not be fetched. Please ensure it exists on the chain.`
+            `Module '${moduleId}' is not loaded in the cache. Please load it before using it in a batched call.`
           );
         }
-      }else{
-        throw new Error(
-          `Module '${moduleId}' is not loaded in the cache. Please load it before using it in a batched call.`
-        );
       }
-    };
-    for (const ty of structTag.value.typeArgs) {
-      const result = await this.collectRequiredModulesFromTypeTag(ty, options);
-      for (const module of result) {
-        modules.add(module);
+      for (const ty of structTag.value.typeArgs) {
+        const result = await this.collectRequiredModulesFromTypeTag(ty, options);
+        for (const module of result) {
+          modules.add(module);
+        }
       }
-    }
-  } else if (typeTag.isVector()) {
+    } else if (typeTag.isVector()) {
       const result = await this.collectRequiredModulesFromTypeTag(typeTag.value, options);
       for (const module of result) {
         modules.add(module);
       }
+    }
+    return modules;
   }
-  return modules;
-}
 
   build(): Uint8Array {
     return this.builder.generate_batched_calls(true);
@@ -270,7 +272,7 @@ export async function BuildScriptComposerTransaction(args: {
     args.withFeePayer === true ? AccountAddress.ZERO : undefined
   );
 }
- 
+
 export async function getModuleInner(args: {
   aptosConfig: AptosConfig;
   accountAddress: AccountAddressInput;
@@ -279,7 +281,7 @@ export async function getModuleInner(args: {
 }): Promise<MoveModuleBytecode> {
   const { aptosConfig, accountAddress, moduleName, options } = args;
 
-  const { data } =  await getAptosFullNode<{}, MoveModuleBytecode>({
+  const { data } = await getAptosFullNode<{}, MoveModuleBytecode>({
     aptosConfig,
     originMethod: 'getModule',
     path: `accounts/${AccountAddress.from(accountAddress).toString()}/module/${moduleName}`,
