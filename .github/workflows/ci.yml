@@ -99,4 +99,4 @@ jobs:
       - name: Build example projects
         run: |
           # Build all workspace packages under examples/** that define a "build" script
-          pnpm -r --filter "./examples/**" run build --if-present
+          pnpm -r --filter "./examples/**" run build
