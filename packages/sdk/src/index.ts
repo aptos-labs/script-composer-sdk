@@ -93,7 +93,7 @@ export class AptosScriptComposer {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
     const module = input.moduleAbi;
     const moduleBytecode = input.moduleBytecodes;
-    const autoFetch = input.autoFetch !== false; // Default to true
+    const autoFetch = input.autoFetch ?? true; // Default to true
 
     moduleBytecode?.forEach((module) => {
       this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
