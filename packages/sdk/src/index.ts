@@ -139,7 +139,9 @@ export class AptosScriptComposer {
     const isModuleLoaded = AptosScriptComposer.loadedModulesCache.has(moduleId);
     const isModuleStored = this.storedModulesMap.has(moduleId);
 
-    // If module is not loaded or not stored, and autoFetch is enabled, fetch and store it
+    // If the module is not loaded in the global cache (isModuleLoaded) or not stored in the local map (isModuleStored),
+    // and autoFetch is enabled, we need to fetch and store the module.
+    // This ensures that the module is available both globally and locally for execution.
     if ((!isModuleLoaded || !isModuleStored) && autoFetch) {
       // If the module is not loaded, we can fetch it.
       const moduleBytecode = await getModuleInner({
