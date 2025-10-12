@@ -52,6 +52,6 @@
     "vitest": "3.2.4"
   },
   "dependencies": {
-    "@aptos-labs/script-composer-pack": "0.2.0-0"
+    "@aptos-labs/script-composer-pack": "0.2.0"
   }
 }
