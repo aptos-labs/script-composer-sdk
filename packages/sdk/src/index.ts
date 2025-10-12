@@ -124,10 +124,6 @@ export class AptosScriptComposer {
           `Module '${moduleAddress}::${moduleName}' is not loaded in the cache and autoFetch is disabled. Please load it before using it in a batched call.`
         );
       }
-    } else if (!isModuleLoaded && !autoFetch) {
-      throw new Error(
-        `Module '${moduleAddress}::${moduleName}' is not loaded in the cache. Please load it before using it in a batched call.`
-      );
     }
 
     if (input.typeArguments !== undefined) {
