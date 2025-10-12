@@ -141,23 +141,17 @@ export class AptosScriptComposer {
 
     // If module is not loaded or not stored, and autoFetch is enabled, fetch and store it
     if ((!isModuleLoaded || !isModuleStored) && autoFetch) {
-      if (input.options?.allowFetch !== false) {
-        // If the module is not loaded, we can fetch it.
-        const moduleBytecode = await getModuleInner({
-          aptosConfig: this.config,
-          accountAddress: moduleAddress,
-          moduleName: moduleName.toString(),
-        });
-        if (moduleBytecode) {
-          this.storeModule(moduleBytecode, moduleId);
-        } else {
-          throw new Error(
-            `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
-          );
-        }
+      // If the module is not loaded, we can fetch it.
+      const moduleBytecode = await getModuleInner({
+        aptosConfig: this.config,
+        accountAddress: moduleAddress,
+        moduleName: moduleName.toString(),
+      });
+      if (moduleBytecode) {
+        this.storeModule(moduleBytecode, moduleId);
       } else {
         throw new Error(
-          `Module '${moduleAddress}::${moduleName}' is not loaded in the cache and autoFetch is disabled. Please load it before using it in a batched call.`
+          `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
         );
       }
     }
