@@ -41,7 +41,6 @@ export type InputBatchedFunctionData = {
   >;
   moduleAbi?: MoveModule;
   moduleBytecodes?: string[];
-  autoFetch?: boolean;
   options?: {
     allowFetch?: boolean;
   };
@@ -93,7 +92,32 @@ export class AptosScriptComposer {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
     const module = input.moduleAbi;
     const moduleBytecode = input.moduleBytecodes;
-    const autoFetch = input.autoFetch ?? true; // Default to true
+    const autoFetch = input.options?.allowFetch !== false; // Default to true
+
+    // Validation logic based on auto-fetch option
+    if (autoFetch) {
+      // Auto-fetch mode: Check if function exists in ABI
+      if (module) {
+        const functionAbi = module.exposed_functions.find((func) => func.name === functionName);
+        if (!functionAbi) {
+          throw new Error(
+            `Function '${functionName}' not found in provided ABI for module '${moduleAddress}::${moduleName}'`
+          );
+        };
+      }
+    } else {
+      // Manual mode: Check if both ABI and bytecode are provided
+      if (!module) {
+        throw new Error(
+          `Module ABI is required when auto-fetch is disabled for '${moduleAddress}::${moduleName}'`
+        );
+      }
+      if (!moduleBytecode || moduleBytecode.length === 0) {
+        throw new Error(
+          `Module bytecode is required when auto-fetch is disabled for '${moduleAddress}::${moduleName}'`
+        );
+      }
+    }
 
     moduleBytecode?.forEach((module) => {
       this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
