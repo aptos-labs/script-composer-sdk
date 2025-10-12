@@ -128,8 +128,8 @@ importers:
   packages/sdk:
     dependencies:
       '@aptos-labs/script-composer-pack':
-        specifier: 0.2.0-0
-        version: 0.2.0-0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
+        specifier: 0.2.0
+        version: 0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
       '@aptos-labs/ts-sdk':
         specifier: ^3.0.0 || ^4.0.0 || ^5.0.0
         version: 5.1.0(got@11.8.6)
@@ -188,10 +188,10 @@ packages:
   '@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1':
     resolution: {integrity: sha512-rQKPOkTqUdZeJv1HPu+UPpNOen2PJzX8GS5Ux1j75jwSLNAmWF+wukXHHdiMYqP6J1kMJiLLGTCuIYk4bJz8tw==}
 
-  '@aptos-labs/script-composer-pack@0.2.0-0':
-    resolution: {integrity: sha512-TwxNqWLNp2j6hZzBKr6rxmSDTCwZy6hPP68IxyQsL+D2voRfUZ5ojclWH/fCLQaEy60WcTZjnOvKkm9cscNCOQ==}
+  '@aptos-labs/script-composer-pack@0.2.0':
+    resolution: {integrity: sha512-dIcukN8eJbrCEutpvB0N1kXReG9TSgg2KLptchx1OB7YslAPmeKaPIIwa5Kckbhe/fT6IUGGkNlsqBRqCYdr6g==}
     peerDependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.4-1
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.4
       '@aptos-labs/ts-sdk': ^3.0.0 || ^4.0.0 || ^5.0.0
 
   '@aptos-labs/ts-sdk@5.1.0':
@@ -3098,7 +3098,7 @@ snapshots:
 
   '@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1': {}
 
-  '@aptos-labs/script-composer-pack@0.2.0-0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))':
+  '@aptos-labs/script-composer-pack@0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))':
     dependencies:
       '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.4-1
       '@aptos-labs/ts-sdk': 5.1.0(got@11.8.6)
