@@ -42,6 +42,7 @@ export type InputBatchedFunctionData = {
   moduleAbi?: MoveModule;
   moduleBytecodes?: string[];
   options?: {
+    /** @default true - Automatically fetch missing modules from the chain */
     allowFetch?: boolean;
   };
 };
@@ -88,11 +89,22 @@ export class AptosScriptComposer {
   // or the regular entry function arguments.
   //
   // The function would also return a list of `CallArgument` that can be passed on to future calls.
+  //
+  // Validation behavior:
+  // - If allowFetch is true (default): Validates that the function exists in the provided ABI (if any)
+  // - If allowFetch is false: Requires both moduleAbi and moduleBytecodes to be provided
+  // - Automatically fetches missing modules from the chain when allowFetch is enabled
   async addBatchedCalls(input: InputBatchedFunctionData): Promise<CallArgument[]> {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
     const module = input.moduleAbi;
     const moduleBytecode = input.moduleBytecodes;
-    const autoFetch = input.options?.allowFetch !== false; // Default to true
+    // Set default value for allowFetch if not provided, preserving other options
+    if (input.options) {
+      input.options.allowFetch = input.options.allowFetch ?? true;
+    } else {
+      input.options = { allowFetch: true };
+    }
+    const autoFetch = input.options.allowFetch;
 
     // Validation logic based on auto-fetch option
     if (autoFetch) {
