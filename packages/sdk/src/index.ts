@@ -115,7 +115,7 @@ export class AptosScriptComposer {
           throw new Error(
             `Function '${functionName}' not found in provided ABI for module '${moduleAddress}::${moduleName}'`
           );
-        };
+        }
       }
     } else {
       // Manual mode: Check if both ABI and bytecode are provided
