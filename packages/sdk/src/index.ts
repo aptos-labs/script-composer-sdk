@@ -98,13 +98,7 @@ export class AptosScriptComposer {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
     const module = input.moduleAbi;
     const moduleBytecode = input.moduleBytecodes;
-    // Set default value for allowFetch if not provided, preserving other options
-    if (input.options) {
-      input.options.allowFetch = input.options.allowFetch ?? true;
-    } else {
-      input.options = { allowFetch: true };
-    }
-    const autoFetch = input.options.allowFetch;
+    const autoFetch = input.options?.allowFetch ?? true;
 
     // Validation logic based on auto-fetch option
     if (autoFetch) {
@@ -229,11 +223,11 @@ export class AptosScriptComposer {
   }
 
   /**
-   * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are present in the cache.
-   * If allowFetch is true, missing modules will be fetched from the chain and added to the cache.
+   * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are loaded and stored.
+   * If allowFetch is true, missing modules will be fetched from the chain and stored in both the global cache and local composer.
    *
    * @param typeTag - The TypeTag to analyze (can be struct, vector, etc.).
-   * @param options - Optional object. If options.allowFetch is true, missing modules will be fetched from the chain.
+   * @param options - Optional object. If options.allowFetch is true (default), missing modules will be fetched from the chain.
    * @returns Promise<Set<string>> - A set of all module IDs (address::moduleName) required by the typeTag and its nested type arguments.
    * @throws Error if a required module is missing and allowFetch is false, or if fetching fails.
    */
@@ -246,8 +240,9 @@ export class AptosScriptComposer {
       const structTag = typeTag as TypeTagStruct;
       const moduleId = `${structTag.value.address}::${structTag.value.moduleName.identifier.toString()}`;
       modules.add(moduleId);
+      const autoFetch = options?.allowFetch ?? true;
       if (!AptosScriptComposer.loadedModulesCache.has(moduleId)) {
-        if (options?.allowFetch) {
+        if (autoFetch) {
           // If the module is not loaded, we can fetch it.
           const module = await getModuleInner({
             aptosConfig: this.config,
