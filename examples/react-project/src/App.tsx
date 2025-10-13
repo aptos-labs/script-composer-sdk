@@ -26,7 +26,8 @@ function App() {
             function: '0x1::aptos_account::transfer',
             functionArguments: [ CallArgument.newSigner(0) ,'0x1', 1],
             typeArguments: [],
-            moduleAbi: aptos_account_module.abi!,
+            moduleAbi: aptos_account_module.abi,
+            moduleBytecodes: [aptos_account_module.bytecode],
           });
           return composer
         },
