@@ -23,6 +23,7 @@ async function mainWithCache() {
           allowFetch: false,
         },
         moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
       });
       return composer
     },
