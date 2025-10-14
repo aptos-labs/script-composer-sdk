@@ -39,9 +39,10 @@ export type InputBatchedFunctionData = {
   functionArguments: Array<
     EntryFunctionArgumentTypes | CallArgument | SimpleEntryFunctionArgumentTypes
   >;
-  moduleAbi: MoveModule;
+  moduleAbi?: MoveModule;
   moduleBytecodes?: string[];
   options?: {
+    /** @default true - Automatically fetch missing modules from the chain */
     allowFetch?: boolean;
   };
 };
@@ -88,33 +89,65 @@ export class AptosScriptComposer {
   // or the regular entry function arguments.
   //
   // The function would also return a list of `CallArgument` that can be passed on to future calls.
+  //
+  // Validation behavior:
+  // - If allowFetch is true (default): Validates that the function exists in the provided ABI (if any)
+  // - If allowFetch is false: Requires both moduleAbi and moduleBytecodes to be provided
+  // - Automatically fetches missing modules from the chain when allowFetch is enabled
   async addBatchedCalls(input: InputBatchedFunctionData): Promise<CallArgument[]> {
     const { moduleAddress, moduleName, functionName } = getFunctionParts(input.function);
     const module = input.moduleAbi;
     const moduleBytecode = input.moduleBytecodes;
+    const autoFetch = input.options?.allowFetch ?? true;
+
+    // Validation logic based on auto-fetch option
+    if (autoFetch) {
+      // Auto-fetch mode: Check if function exists in ABI
+      if (module) {
+        const functionAbi = module.exposed_functions.find((func) => func.name === functionName);
+        if (!functionAbi) {
+          throw new Error(
+            `Function '${functionName}' not found in provided ABI for module '${moduleAddress}::${moduleName}'`
+          );
+        }
+      }
+    } else {
+      // Manual mode: Check if both ABI and bytecode are provided
+      if (!module) {
+        throw new Error(
+          `Module ABI is required when auto-fetch is disabled for '${moduleAddress}::${moduleName}'`
+        );
+      }
+      if (!moduleBytecode || moduleBytecode.length === 0) {
+        throw new Error(
+          `Module bytecode is required when auto-fetch is disabled for '${moduleAddress}::${moduleName}'`
+        );
+      }
+    }
 
     moduleBytecode?.forEach((module) => {
       this.builder.store_module(Hex.fromHexInput(module).toUint8Array());
     });
 
-    if (!AptosScriptComposer.loadedModulesCache.has(`${moduleAddress}::${moduleName}`)) {
-      if (input.options?.allowFetch) {
-        // If the module is not loaded, we can fetch it.
-        const moduleBytecode = await getModuleInner({
-          aptosConfig: this.config,
-          accountAddress: moduleAddress,
-          moduleName: moduleName.toString(),
-        });
-        if (moduleBytecode) {
-          this.storeModule(moduleBytecode, `${moduleAddress}::${moduleName}`);
-        } else {
-          throw new Error(
-            `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
-          );
-        }
+    const moduleId = `${moduleAddress}::${moduleName}`;
+    const isModuleLoaded = AptosScriptComposer.loadedModulesCache.has(moduleId);
+    const isModuleStored = this.storedModulesMap.has(moduleId);
+
+    // If the module is not loaded in the global cache (isModuleLoaded) or not stored in the local map (isModuleStored),
+    // and autoFetch is enabled, we need to fetch and store the module.
+    // This ensures that the module is available both globally and locally for execution.
+    if ((!isModuleLoaded || !isModuleStored) && autoFetch) {
+      // If the module is not loaded, we can fetch it.
+      const moduleBytecode = await getModuleInner({
+        aptosConfig: this.config,
+        accountAddress: moduleAddress,
+        moduleName: moduleName.toString(),
+      });
+      if (moduleBytecode) {
+        this.storeModule(moduleBytecode, moduleId);
       } else {
         throw new Error(
-          `Module '${moduleAddress}::${moduleName}' is not loaded in the cache. Please load it before using it in a batched call.`
+          `Module '${moduleAddress}::${moduleName}' could not be fetched. Please ensure it exists on the chain.`
         );
       }
     }
@@ -190,11 +223,11 @@ export class AptosScriptComposer {
   }
 
   /**
-   * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are present in the cache.
-   * If allowFetch is true, missing modules will be fetched from the chain and added to the cache.
+   * Recursively collects all required module IDs from a given TypeTag, ensuring all dependent modules are loaded and stored.
+   * If allowFetch is true, missing modules will be fetched from the chain and stored in both the global cache and local composer.
    *
    * @param typeTag - The TypeTag to analyze (can be struct, vector, etc.).
-   * @param options - Optional object. If options.allowFetch is true, missing modules will be fetched from the chain.
+   * @param options - Optional object. If options.allowFetch is true (default), missing modules will be fetched from the chain.
    * @returns Promise<Set<string>> - A set of all module IDs (address::moduleName) required by the typeTag and its nested type arguments.
    * @throws Error if a required module is missing and allowFetch is false, or if fetching fails.
    */
@@ -207,8 +240,9 @@ export class AptosScriptComposer {
       const structTag = typeTag as TypeTagStruct;
       const moduleId = `${structTag.value.address}::${structTag.value.moduleName.identifier.toString()}`;
       modules.add(moduleId);
+      const autoFetch = options?.allowFetch ?? true;
       if (!AptosScriptComposer.loadedModulesCache.has(moduleId)) {
-        if (options?.allowFetch) {
+        if (autoFetch) {
           // If the module is not loaded, we can fetch it.
           const module = await getModuleInner({
             aptosConfig: this.config,
