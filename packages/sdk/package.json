@@ -1,6 +1,6 @@
 {
   "name": "@aptos-labs/script-composer-sdk",
-  "version": "0.3.0-3",
+  "version": "0.3.1",
   "description": "Script Composer SDK",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
