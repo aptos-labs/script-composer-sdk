@@ -127,6 +127,9 @@ importers:
 
   packages/sdk:
     dependencies:
+      '@aptos-labs/script-composer-pack':
+        specifier: ^0.2.0
+        version: 0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
       '@aptos-labs/ts-sdk':
         specifier: ^3.0.0 || ^4.0.0 || ^5.0.0
         version: 5.1.0(got@11.8.6)
@@ -134,9 +137,6 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
     devDependencies:
-      '@aptos-labs/script-composer-pack':
-        specifier: ^0.2.0
-        version: 0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
       '@eslint/js':
         specifier: 9.36.0
         version: 9.36.0
