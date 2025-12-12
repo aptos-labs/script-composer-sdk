@@ -12,7 +12,7 @@
     "@aptos-labs/script-composer-sdk": "workspace:*",
     "@aptos-labs/ts-sdk": "^5.1.0",
     "@keyv/offline": "^4.0.2",
-    "next": "15.5.4",
+    "next": "15.5.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
