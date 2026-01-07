@@ -128,8 +128,8 @@ importers:
   packages/sdk:
     dependencies:
       '@aptos-labs/script-composer-pack':
-        specifier: ^0.2.0
-        version: 0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
+        specifier: ^0.2.1
+        version: 0.2.1(@aptos-labs/aptos-dynamic-transaction-composer@0.1.5)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))
       '@aptos-labs/ts-sdk':
         specifier: ^3.0.0 || ^4.0.0 || ^5.0.0
         version: 5.1.0(got@11.8.6)
@@ -188,13 +188,13 @@ packages:
     peerDependencies:
       got: ^11.8.6
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1':
-    resolution: {integrity: sha512-rQKPOkTqUdZeJv1HPu+UPpNOen2PJzX8GS5Ux1j75jwSLNAmWF+wukXHHdiMYqP6J1kMJiLLGTCuIYk4bJz8tw==}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.5':
+    resolution: {integrity: sha512-Xs8BSCcL4hnpYONFC2e2Kj/vqvMVJU9l70vN0RNMagYLsvyiyNgUo55I+5uCrhIgj68bgxFsSoKUh/XDpDqRiw==}
 
-  '@aptos-labs/script-composer-pack@0.2.0':
-    resolution: {integrity: sha512-dIcukN8eJbrCEutpvB0N1kXReG9TSgg2KLptchx1OB7YslAPmeKaPIIwa5Kckbhe/fT6IUGGkNlsqBRqCYdr6g==}
+  '@aptos-labs/script-composer-pack@0.2.1':
+    resolution: {integrity: sha512-5cG2I2QwQlHhuxkvEF9WY8ctwsNM6SYT6JcnsNK9T0o1cItmLUXf2TF+4MRlOUdh3WbhOSY1EWm9BbLQl/IXAQ==}
     peerDependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.4
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.5
       '@aptos-labs/ts-sdk': ^3.0.0 || ^4.0.0 || ^5.0.0
 
   '@aptos-labs/ts-sdk@5.1.0':
@@ -3099,11 +3099,11 @@ snapshots:
     dependencies:
       got: 11.8.6
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1': {}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.5': {}
 
-  '@aptos-labs/script-composer-pack@0.2.0(@aptos-labs/aptos-dynamic-transaction-composer@0.1.4-1)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))':
+  '@aptos-labs/script-composer-pack@0.2.1(@aptos-labs/aptos-dynamic-transaction-composer@0.1.5)(@aptos-labs/ts-sdk@5.1.0(got@11.8.6))':
     dependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.4-1
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.5
       '@aptos-labs/ts-sdk': 5.1.0(got@11.8.6)
 
   '@aptos-labs/ts-sdk@5.1.0(got@11.8.6)':
