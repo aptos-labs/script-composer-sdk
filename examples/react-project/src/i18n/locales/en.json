@@ -1,0 +1,44 @@
+{
+  "common": {
+    "title": "Script Composer SDK Demo",
+    "subtitle": "Build and simulate Aptos blockchain transactions"
+  },
+  "form": {
+    "title": "Transaction Parameters",
+    "senderAddress": "Sender Address",
+    "receiverAddress": "Receiver Address",
+    "amount": "Transfer Amount (APT)",
+    "useCache": "Use Module Cache (Recommended)",
+    "cacheHint": "Enable to pre-fetch and cache modules for better performance",
+    "required": "Required"
+  },
+  "buttons": {
+    "simulate": "Simulate Transaction",
+    "simulating": "Simulating...",
+    "showCode": "Show Code",
+    "hideCode": "Hide Code",
+    "copyCode": "Copy Code",
+    "copied": "✓ Copied",
+    "close": "Close"
+  },
+  "errors": {
+    "fillAllFields": "Please fill in all required fields",
+    "invalidAmount": "Amount must be a number greater than 0",
+    "simulationFailed": "Transaction simulation failed, please check input parameters"
+  },
+  "code": {
+    "title": "Code Example"
+  },
+  "results": {
+    "title": "Transaction Simulation Result",
+    "status": "Transaction Status",
+    "success": "✓ Success",
+    "failure": "✗ Failed",
+    "gasFees": "Gas Fees",
+    "gasUsed": "Gas Used",
+    "gasUnitPrice": "Gas Unit Price",
+    "vmStatus": "VM Status",
+    "fullResponse": "Full Response Data",
+    "viewJson": "View JSON Data"
+  }
+}

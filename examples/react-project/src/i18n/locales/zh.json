@@ -1,0 +1,44 @@
+{
+  "common": {
+    "title": "Script Composer SDK 演示",
+    "subtitle": "构建和模拟 Aptos 区块链交易"
+  },
+  "form": {
+    "title": "交易参数",
+    "senderAddress": "发送者地址",
+    "receiverAddress": "接收者地址",
+    "amount": "转账金额 (APT)",
+    "useCache": "使用模块缓存（推荐）",
+    "cacheHint": "启用后将预先获取并缓存模块，提高性能",
+    "required": "必填"
+  },
+  "buttons": {
+    "simulate": "模拟交易",
+    "simulating": "模拟中...",
+    "showCode": "显示代码",
+    "hideCode": "隐藏代码",
+    "copyCode": "复制代码",
+    "copied": "✓ 已复制",
+    "close": "关闭"
+  },
+  "errors": {
+    "fillAllFields": "请填写所有必填字段",
+    "invalidAmount": "金额必须是大于0的数字",
+    "simulationFailed": "交易模拟失败，请检查输入参数"
+  },
+  "code": {
+    "title": "代码示例"
+  },
+  "results": {
+    "title": "交易模拟结果",
+    "status": "交易状态",
+    "success": "✓ 成功",
+    "failure": "✗ 失败",
+    "gasFees": "Gas 费用",
+    "gasUsed": "Gas 使用量",
+    "gasUnitPrice": "Gas 单价",
+    "vmStatus": "虚拟机状态",
+    "fullResponse": "完整响应数据",
+    "viewJson": "查看 JSON 数据"
+  }
+}
