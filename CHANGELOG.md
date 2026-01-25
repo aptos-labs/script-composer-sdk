@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.3.3-beta.1
+
+- Beta release with improvements and bug fixes
+
 # 0.3.3-beta
 
 - Beta release with improvements and bug fixes
