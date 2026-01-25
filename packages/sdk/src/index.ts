@@ -59,20 +59,17 @@ export class AptosScriptComposer {
 
   private storedModulesMap: Set<string> = new Set();
 
-  constructor(
-    aptosConfig: AptosConfig,
-    numSigners: number = 1,
-    hasFeePayer: boolean = false
-  ) {
+  constructor(aptosConfig: AptosConfig, numSigners: number = 1, hasFeePayer: boolean = false) {
     this.config = aptosConfig;
     if (!AptosScriptComposer.transactionComposer) {
       initSync({ module: wasmModule });
       AptosScriptComposer.transactionComposer = TransactionComposer;
     }
     // Use multi_signer if there are multiple signers OR if there's a fee payer
-    this.builder = (numSigners > 1 || hasFeePayer)
-      ? AptosScriptComposer.transactionComposer.multi_signer(numSigners)
-      : AptosScriptComposer.transactionComposer.single_signer();
+    this.builder =
+      numSigners > 1 || hasFeePayer
+        ? AptosScriptComposer.transactionComposer.multi_signer(numSigners)
+        : AptosScriptComposer.transactionComposer.single_signer();
   }
 
   storeModule(module: MoveModuleBytecode, moduleName?: string): void {
@@ -310,22 +307,23 @@ type BaseBuildScriptComposerArgs = {
 /**
  * Internal helper to build and generate raw transaction from composer
  */
-async function buildRawTransactionFromComposer(
-  args: BaseBuildScriptComposerArgs
-): Promise<{ rawTxn: any; sender: AccountAddressInput }> {
+async function buildRawTransactionFromComposer(args: BaseBuildScriptComposerArgs): Promise<{
+  rawTxn: Awaited<ReturnType<typeof generateRawTransaction>>;
+  sender: AccountAddressInput;
+}> {
   // Calculate total number of signers: 1 (sender) + secondary signers count
   // Note: fee payer does NOT count as a signer
   const numSigners = 1 + (args.secondarySignerAddresses?.length || 0);
-  
+
   // Check if fee payer is present
   // - BuildScriptComposerMultiAgentTransaction uses feePayerAddress
   // - BuildScriptComposerTransaction uses withFeePayer flag
   const hasFeePayer = args.feePayerAddress !== undefined || args.withFeePayer === true;
-  
+
   const composer = new AptosScriptComposer(args.aptosConfig, numSigners, hasFeePayer);
   const builtComposer = await args.builder(composer);
   const scriptBytes = builtComposer.build();
-  
+
   const rawTxn = await generateRawTransaction({
     payload: TransactionPayloadScript.load(new Deserializer(scriptBytes)),
     sender: args.sender,
@@ -352,10 +350,10 @@ export async function BuildScriptComposerTransaction(args: {
 
 /**
  * Builds a multi-agent transaction from a script composer builder.
- * 
+ *
  * Multi-agent transactions allow multiple signers to participate in a transaction,
  * where the sender is the primary signer and additional signers can be added.
- * 
+ *
  * @param args - Configuration for building the multi-agent transaction
  * @param args.sender - The primary account address that will sign the transaction
  * @param args.builder - Async function that receives and returns an AptosScriptComposer instance
@@ -364,7 +362,7 @@ export async function BuildScriptComposerTransaction(args: {
  * @param args.secondarySignerAddresses - Optional array of secondary signer addresses for multi-agent transactions
  * @param args.feePayerAddress - Optional account address that sponsors the transaction's gas fees
  * @returns Promise resolving to a MultiAgentTransaction ready for signing
- * 
+ *
  * @example
  * ```typescript
  * const transaction = await BuildScriptComposerMultiAgentTransaction({
@@ -392,19 +390,15 @@ export async function BuildScriptComposerMultiAgentTransaction(args: {
     secondarySignerAddresses: args.secondarySignerAddresses,
     feePayerAddress: args.feePayerAddress,
   });
-  
+
   const secondarySigners: AccountAddress[] = args.secondarySignerAddresses
     ? args.secondarySignerAddresses.map((signer) => AccountAddress.from(signer))
     : [];
-  
-  const feePayer = args.feePayerAddress
-    ? AccountAddress.from(args.feePayerAddress)
-    : undefined;
-  
+
+  const feePayer = args.feePayerAddress ? AccountAddress.from(args.feePayerAddress) : undefined;
+
   return new MultiAgentTransaction(rawTxn, secondarySigners, feePayer);
 }
-
-
 
 export async function getModuleInner(args: {
   aptosConfig: AptosConfig;
