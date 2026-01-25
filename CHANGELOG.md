@@ -1,5 +1,21 @@
-
 # Unreleased
+
+# 0.3.3-beta
+
+- Beta release with improvements and bug fixes
+
+# 0.3.2
+
+- Update dependencies and bug fixes
+
+# 0.3.1
+
+- Update dependencies and improvements
+
+# 0.3.0
+
+- Enhanced AptosScriptComposer with auto-fetch capability
+- Update script-composer-pack dependency
 
 # 0.1.1
 
