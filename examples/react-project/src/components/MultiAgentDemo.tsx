@@ -1,19 +1,14 @@
-'use client';
-
 import { useState, useMemo } from 'react';
 import { AptosConfig, Network, MultiAgentTransaction } from '@aptos-labs/ts-sdk';
-import { BuildScriptComposerMultiAgentTransaction, CallArgument, getModuleInner, AptosScriptComposer } from "@aptos-labs/script-composer-sdk";
-import Link from 'next/link';
+import { BuildScriptComposerMultiAgentTransaction, CallArgument, getModuleInner, AptosScriptComposer } from '@aptos-labs/script-composer-sdk';
 import { Highlight } from 'prism-react-renderer';
 import { themes } from 'prism-react-renderer';
-import { useI18n } from '../../i18n/client';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import ThemeToggle from '../components/ThemeToggle';
+import { useTranslation } from 'react-i18next';
 
 type ScenarioType = 'basic' | 'secondary' | 'feePayer' | 'complete';
 
-export default function MultiAgentPage() {
-  const { t, mounted } = useI18n();
+export default function MultiAgentDemo() {
+  const { t } = useTranslation();
   const [scenario, setScenario] = useState<ScenarioType>('basic');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -151,7 +146,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
         return;
       }
 
-      // 获取模块
+      // Get module
       const aptos_account_module = await getModuleInner({
         aptosConfig: new AptosConfig({ network: Network.TESTNET }),
         accountAddress: '0x1',
@@ -192,7 +187,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
         }),
       };
 
-      // 根据场景添加参数
+      // Add parameters based on scenario
       if (scenario === 'secondary' || scenario === 'complete') {
         txArgs.secondarySignerAddresses = getValidSecondarySigners();
       }
@@ -214,29 +209,15 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
   }
 
   const scenarios = [
-    { id: 'basic' as ScenarioType, color: 'blue' },
-    { id: 'secondary' as ScenarioType, color: 'green' },
-    { id: 'feePayer' as ScenarioType, color: 'purple' },
-    { id: 'complete' as ScenarioType, color: 'indigo' },
+    { id: 'basic' as ScenarioType, name: t('multiAgent.scenarios.basic.name'), desc: t('multiAgent.scenarios.basic.desc') },
+    { id: 'secondary' as ScenarioType, name: t('multiAgent.scenarios.secondary.name'), desc: t('multiAgent.scenarios.secondary.desc') },
+    { id: 'feePayer' as ScenarioType, name: t('multiAgent.scenarios.feePayer.name'), desc: t('multiAgent.scenarios.feePayer.desc') },
+    { id: 'complete' as ScenarioType, name: t('multiAgent.scenarios.complete.name'), desc: t('multiAgent.scenarios.complete.desc') },
   ];
-
-  if (!mounted) {
-    return null; // Prevent hydration mismatch
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="absolute top-4 right-4 z-10 flex gap-2 items-center">
-          <ThemeToggle />
-          <LanguageSwitcher />
-        </div>
-        <div className="mb-6">
-          <Link href="/" className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
-            {t('common.backToHome')}
-          </Link>
-        </div>
-
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             {t('multiAgent.title')}
@@ -247,7 +228,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
         </div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 左侧：表单区域 */}
+          {/* Left: Form Section */}
           <div className="space-y-6">
             {/* Scenario Selection */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -258,9 +239,9 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                     key={s.id}
                     className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
                       scenario === s.id
-                        ? s.color === 'blue' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' :
-                          s.color === 'green' ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-400' :
-                          s.color === 'purple' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-400' :
+                        ? s.id === 'basic' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' :
+                          s.id === 'secondary' ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-400' :
+                          s.id === 'feePayer' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-400' :
                           'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-400'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -274,8 +255,8 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                       className="mt-1 mr-3"
                     />
                     <div className="flex-1">
-                      <div className="font-semibold text-gray-800 dark:text-white">{t(`multiAgent.scenarios.${s.id}.name`)}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t(`multiAgent.scenarios.${s.id}.desc`)}</div>
+                      <div className="font-semibold text-gray-800 dark:text-white">{s.name}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{s.desc}</div>
                     </div>
                   </label>
                 ))}
@@ -320,7 +301,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                             type="button"
                             onClick={() => removeSecondarySigner(index)}
                             disabled={isLoading}
-                            className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 disabled:opacity-50"
+                            className="px-3 py-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 disabled:opacity-50"
                           >
                             {t('buttons.remove')}
                           </button>
@@ -351,7 +332,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                       disabled={isLoading}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-600"
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t('multiAgent.form.feePayerHint')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('multiAgent.form.feePayerHint')}</p>
                   </div>
                 )}
 
@@ -464,7 +445,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">{t('multiAgent.results.transactionType')}</h3>
-                    <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded-lg inline-block font-semibold">
+                    <div className="bg-indigo-100 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-300 px-3 py-2 rounded-lg inline-block font-semibold">
                       {t('multiAgent.results.multiAgent')}
                     </div>
                   </div>
@@ -487,7 +468,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-gray-400 italic">{t('multiAgent.results.none')}</div>
+                      <div className="text-gray-400 dark:text-gray-500 italic">{t('multiAgent.results.none')}</div>
                     )}
                   </div>
 
@@ -521,8 +502,8 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
                     </div>
                   </div>
 
-                  <details className="border border-gray-200 rounded-lg overflow-hidden">
-                    <summary className="bg-gray-50 dark:bg-gray-700 px-4 py-3 cursor-pointer font-medium text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  <details className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+                    <summary className="bg-gray-50 dark:bg-gray-700 px-4 py-3 cursor-pointer font-medium text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                       {t('multiAgent.results.viewFullObject')}
                     </summary>
                     <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto text-xs font-mono max-h-96 overflow-y-auto">
@@ -540,7 +521,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div className="text-center text-gray-400 py-12">
+                <div className="text-center text-gray-400 dark:text-gray-500 py-12">
                   <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>

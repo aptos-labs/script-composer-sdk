@@ -19,12 +19,18 @@
     "hideCode": "隐藏代码",
     "copyCode": "复制代码",
     "copied": "✓ 已复制",
-    "close": "关闭"
+    "close": "关闭",
+    "build": "构建交易",
+    "building": "构建中...",
+    "addSigner": "+ 添加签名者",
+    "remove": "删除"
   },
   "errors": {
     "fillAllFields": "请填写所有必填字段",
     "invalidAmount": "金额必须是大于0的数字",
-    "simulationFailed": "交易模拟失败，请检查输入参数"
+    "simulationFailed": "交易模拟失败，请检查输入参数",
+    "addSecondarySigner": "请至少添加一个二级签名者地址",
+    "addFeePayer": "请填写费用支付者地址"
   },
   "code": {
     "title": "代码示例"
@@ -40,5 +46,53 @@
     "vmStatus": "虚拟机状态",
     "fullResponse": "完整响应数据",
     "viewJson": "查看 JSON 数据"
+  },
+  "multiAgent": {
+    "title": "多代理交易演示",
+    "subtitle": "体验 Aptos 多代理交易的不同场景，支持多个签名者和费用支付者",
+    "selectScenario": "选择场景",
+    "transactionParams": "交易参数",
+    "codeExample": "代码示例",
+    "transactionDetails": "交易详情",
+    "scenarios": {
+      "basic": {
+        "name": "基本多代理交易",
+        "desc": "只有发送者，无二级签名者和费用支付者"
+      },
+      "secondary": {
+        "name": "带二级签名者",
+        "desc": "发送者 + 一个或多个二级签名者"
+      },
+      "feePayer": {
+        "name": "带费用支付者",
+        "desc": "发送者 + 费用支付者（赞助交易）"
+      },
+      "complete": {
+        "name": "完整多代理交易",
+        "desc": "发送者 + 二级签名者 + 费用支付者"
+      }
+    },
+    "form": {
+      "senderAddress": "发送者地址",
+      "secondarySigners": "二级签名者地址",
+      "signerPlaceholder": "签名者 {{index}} 地址",
+      "feePayerAddress": "费用支付者地址",
+      "feePayerHint": "费用支付者将承担交易的 Gas 费用",
+      "receiverAddress": "接收者地址",
+      "amount": "转账金额 (APT)"
+    },
+    "results": {
+      "transactionType": "交易类型",
+      "multiAgent": "多代理交易",
+      "sender": "发送者",
+      "secondarySigners": "二级签名者",
+      "none": "无",
+      "feePayer": "费用支付者",
+      "sequenceNumber": "交易序列号",
+      "gasUnitPrice": "Gas 单价",
+      "maxGasAmount": "最大 Gas 量",
+      "viewFullObject": "查看完整交易对象",
+      "noTransaction": "构建交易后将在此显示详情"
+    }
   }
 }

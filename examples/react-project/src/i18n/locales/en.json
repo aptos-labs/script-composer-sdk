@@ -19,12 +19,18 @@
     "hideCode": "Hide Code",
     "copyCode": "Copy Code",
     "copied": "✓ Copied",
-    "close": "Close"
+    "close": "Close",
+    "build": "Build Transaction",
+    "building": "Building...",
+    "addSigner": "+ Add Signer",
+    "remove": "Remove"
   },
   "errors": {
     "fillAllFields": "Please fill in all required fields",
     "invalidAmount": "Amount must be a number greater than 0",
-    "simulationFailed": "Transaction simulation failed, please check input parameters"
+    "simulationFailed": "Transaction simulation failed, please check input parameters",
+    "addSecondarySigner": "Please add at least one secondary signer address",
+    "addFeePayer": "Please fill in the fee payer address"
   },
   "code": {
     "title": "Code Example"
@@ -40,5 +46,53 @@
     "vmStatus": "VM Status",
     "fullResponse": "Full Response Data",
     "viewJson": "View JSON Data"
+  },
+  "multiAgent": {
+    "title": "Multi-Agent Transaction Demo",
+    "subtitle": "Experience different scenarios of Aptos multi-agent transactions with support for multiple signers and fee payers",
+    "selectScenario": "Select Scenario",
+    "transactionParams": "Transaction Parameters",
+    "codeExample": "Code Example",
+    "transactionDetails": "Transaction Details",
+    "scenarios": {
+      "basic": {
+        "name": "Basic Multi-Agent Transaction",
+        "desc": "Only sender, no secondary signers and no fee payer"
+      },
+      "secondary": {
+        "name": "With Secondary Signers",
+        "desc": "Sender + one or more secondary signers"
+      },
+      "feePayer": {
+        "name": "With Fee Payer",
+        "desc": "Sender + fee payer (sponsored transaction)"
+      },
+      "complete": {
+        "name": "Complete Multi-Agent Transaction",
+        "desc": "Sender + secondary signers + fee payer"
+      }
+    },
+    "form": {
+      "senderAddress": "Sender Address",
+      "secondarySigners": "Secondary Signer Addresses",
+      "signerPlaceholder": "Signer {{index}} Address",
+      "feePayerAddress": "Fee Payer Address",
+      "feePayerHint": "The fee payer will cover the gas costs for this transaction",
+      "receiverAddress": "Receiver Address",
+      "amount": "Transfer Amount (APT)"
+    },
+    "results": {
+      "transactionType": "Transaction Type",
+      "multiAgent": "Multi-Agent Transaction",
+      "sender": "Sender",
+      "secondarySigners": "Secondary Signers",
+      "none": "None",
+      "feePayer": "Fee Payer",
+      "sequenceNumber": "Sequence Number",
+      "gasUnitPrice": "Gas Unit Price",
+      "maxGasAmount": "Max Gas Amount",
+      "viewFullObject": "View Complete Transaction Object",
+      "noTransaction": "Transaction details will be displayed here after building"
+    }
   }
 }

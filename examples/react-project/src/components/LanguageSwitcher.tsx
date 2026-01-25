@@ -63,38 +63,39 @@ export default function LanguageSwitcher() {
   }, []);
 
   return (
-    <div className="language-switcher" ref={dropdownRef}>
+    <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="language-switcher-button"
+        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[80px] justify-between"
         aria-label="Select language"
         aria-expanded={isOpen}
       >
-        <span className="language-display">{currentLanguage.display}</span>
+        <span>{currentLanguage.display}</span>
         <svg
-          className={`language-arrow ${isOpen ? 'open' : ''}`}
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
+          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+          stroke="currentColor"
+          viewBox="0 0 12 12"
         >
           <path
-            d="M2 4L6 8L10 4"
-            stroke="currentColor"
-            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeWidth={2}
+            d="M2 4l4 4 4-4"
           />
         </svg>
       </button>
       {isOpen && (
-        <div className="language-dropdown">
+        <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[120px] z-50 transition-all duration-200">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`language-option ${currentLang === lang.code ? 'active' : ''}`}
+              className={`w-full px-4 py-2.5 text-left text-sm transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg ${
+                currentLang === lang.code
+                  ? 'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
               aria-label={`Switch to ${lang.name}`}
             >
               {lang.name}

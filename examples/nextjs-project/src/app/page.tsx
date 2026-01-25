@@ -3,6 +3,7 @@
 import ScriptComposer from "./components/ScriptComposer";
 import Link from 'next/link';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import ThemeToggle from './components/ThemeToggle';
 import { useI18n } from '../i18n/client';
 
 export default function Home() {
@@ -13,16 +14,17 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-12">
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-10 flex gap-2 items-center">
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             {t('common.title')}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
             {t('common.subtitle')}
           </p>
           <div className="flex gap-4 justify-center">

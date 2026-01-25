@@ -173,15 +173,15 @@ async function buildAndSimulateTransaction() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('form.title')}</h2>
-          <p className="text-gray-600 text-sm">{t('form.description')}</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('form.title')}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">{t('form.description')}</p>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="sender" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('form.senderAddress')} <span className="text-red-500">*</span>
             </label>
             <input
@@ -191,7 +191,7 @@ async function buildAndSimulateTransaction() {
               onChange={(e) => setSenderAddress(e.target.value)}
               placeholder="0x1"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-600"
             />
           </div>
 
@@ -206,7 +206,7 @@ async function buildAndSimulateTransaction() {
               onChange={(e) => setReceiverAddress(e.target.value)}
               placeholder="0x1"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-600"
             />
           </div>
 
@@ -223,11 +223,11 @@ async function buildAndSimulateTransaction() {
               min="0"
               step="0.00000001"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-600"
             />
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -236,7 +236,7 @@ async function buildAndSimulateTransaction() {
                 disabled={isLoading}
                 className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
               />
-              <span className="text-sm font-medium text-gray-700">{t('form.useCache')}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('form.useCache')}</span>
             </label>
             <p className="text-xs text-gray-500 mt-1 ml-6">{t('form.cacheHint')}</p>
           </div>
@@ -269,9 +269,9 @@ async function buildAndSimulateTransaction() {
       </div>
 
       {/* Code Display Section */}
-      <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
         <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
-          <h3 className="text-xl font-bold text-gray-800">{t('code.title')}</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white">{t('code.title')}</h3>
           <div className="flex gap-2">
             <button
               onClick={() => setShowCode(!showCode)}
@@ -318,14 +318,14 @@ async function buildAndSimulateTransaction() {
           onClick={handleModalClick}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
-              <h2 className="text-2xl font-bold text-gray-800">{t('results.title')}</h2>
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-xl">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{t('results.title')}</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-3xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-3xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label={t('buttons.close')}
               >
                 ×
@@ -336,29 +336,29 @@ async function buildAndSimulateTransaction() {
               {simulationResult[0] && (
                 <>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('results.status')}</h3>
+                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('results.status')}</h3>
                     <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
                       simulationResult[0].success
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                     }`}>
                       {simulationResult[0].success ? t('results.success') : t('results.failure')}
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('results.gasFees')}</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('results.gasFees')}</h3>
+                    <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 font-medium">{t('results.gasUsed')}:</span>
-                        <span className="text-gray-900 font-mono font-semibold">
+                        <span className="text-gray-900 dark:text-gray-100 font-mono font-semibold">
                           {simulationResult[0].gas_used || 'N/A'}
                         </span>
                       </div>
                       {simulationResult[0].gas_unit_price && (
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600 font-medium">{t('results.gasUnitPrice')}:</span>
-                          <span className="text-gray-900 font-mono font-semibold">
+                          <span className="text-gray-900 dark:text-gray-100 font-mono font-semibold">
                             {simulationResult[0].gas_unit_price}
                           </span>
                         </div>
@@ -368,7 +368,7 @@ async function buildAndSimulateTransaction() {
 
                   {simulationResult[0].vm_status && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('results.vmStatus')}</h3>
+                      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('results.vmStatus')}</h3>
                       <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
                         {simulationResult[0].vm_status}
                       </div>
@@ -380,7 +380,7 @@ async function buildAndSimulateTransaction() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('results.fullResponse')}</h3>
                 <details className="border border-gray-200 rounded-lg overflow-hidden">
-                  <summary className="bg-gray-50 px-4 py-3 cursor-pointer font-medium text-purple-600 hover:bg-gray-100 transition-colors">
+                  <summary className="bg-gray-50 dark:bg-gray-700 px-4 py-3 cursor-pointer font-medium text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                     {t('results.viewJson')}
                   </summary>
                   <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto text-sm font-mono">
