@@ -1,5 +1,9 @@
 import { expect, test, beforeAll } from 'vitest';
-import { AptosScriptComposer, BuildScriptComposerTransaction, BuildScriptComposerMultiAgentTransaction } from '../src/index';
+import {
+  AptosScriptComposer,
+  BuildScriptComposerTransaction,
+  BuildScriptComposerMultiAgentTransaction,
+} from '../src/index';
 import {
   AccountAddress,
   AccountAddressInput,
@@ -35,13 +39,10 @@ let aptos_coin_module: MoveModuleBytecode;
 let primary_fungible_store_module: MoveModuleBytecode;
 let aptos_account_module: MoveModuleBytecode;
 
-// Flag to track if modules were successfully loaded
-let modulesLoaded = false;
-
 beforeAll(async () => {
   try {
     const aptosConfig = new AptosConfig({ network: Network.TESTNET });
-    
+
     coin_module = await getModuleInner({
       aptosConfig,
       accountAddress: '0x1',
@@ -71,16 +72,13 @@ beforeAll(async () => {
       accountAddress: '0x1',
       moduleName: 'aptos_account',
     });
-
-    modulesLoaded = true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to load modules from Aptos Testnet:', error);
-    modulesLoaded = false;
-    const errorMessage = error?.message || String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('getaddrinfo')) {
       throw new Error(
         'Network error: Could not connect to Aptos Testnet. ' +
-        'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.'
+          'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.'
       );
     }
     throw new Error(`Failed to load test modules: ${errorMessage}`);
@@ -320,7 +318,7 @@ test('test composer fetch vs no-fetch behavior', async () => {
 
 test('test BuildScriptComposerMultiAgentTransaction with secondary signers', async () => {
   const secondarySignerAddresses = ['0x2', '0x3'];
-  
+
   const txn = await BuildScriptComposerMultiAgentTransaction({
     sender: AccountAddress.ONE,
     secondarySignerAddresses: secondarySignerAddresses,
@@ -336,7 +334,7 @@ test('test BuildScriptComposerMultiAgentTransaction with secondary signers', asy
         moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        }
+        },
       });
 
       return builder;
@@ -353,7 +351,7 @@ test('test BuildScriptComposerMultiAgentTransaction with secondary signers', asy
 
 test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () => {
   const feePayerAddress = '0x4';
-  
+
   const txn = await BuildScriptComposerMultiAgentTransaction({
     sender: AccountAddress.ONE,
     feePayerAddress: feePayerAddress,
@@ -369,7 +367,7 @@ test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () =>
         moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        }
+        },
       });
 
       return builder;
@@ -386,7 +384,7 @@ test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () =>
 test('test BuildScriptComposerMultiAgentTransaction with secondary signers and fee payer', async () => {
   const secondarySignerAddresses = ['0x2', '0x3'];
   const feePayerAddress = '0x4';
-  
+
   const txn = await BuildScriptComposerMultiAgentTransaction({
     sender: AccountAddress.ONE,
     secondarySignerAddresses: secondarySignerAddresses,
@@ -403,7 +401,7 @@ test('test BuildScriptComposerMultiAgentTransaction with secondary signers and f
         moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        }
+        },
       });
 
       return builder;
@@ -434,7 +432,7 @@ test('test BuildScriptComposerMultiAgentTransaction without optional parameters'
         moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        }
+        },
       });
 
       return builder;
