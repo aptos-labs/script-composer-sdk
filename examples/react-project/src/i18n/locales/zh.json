@@ -5,6 +5,7 @@
   },
   "form": {
     "title": "交易参数",
+    "description": "填写以下信息来构建和模拟交易",
     "senderAddress": "发送者地址",
     "receiverAddress": "接收者地址",
     "amount": "转账金额 (APT)",

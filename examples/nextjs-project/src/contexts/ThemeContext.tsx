@@ -13,95 +13,71 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+/**
+ * Applies theme to the document root consistently
+ */
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  if (theme === 'dark') {
+    root.classList.add('dark');
+    root.style.colorScheme = 'dark';
+  } else {
+    root.classList.remove('dark');
+    root.style.colorScheme = 'light';
+  }
+}
+
+/**
+ * Gets the initial theme from localStorage or system preference
+ */
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light';
+  
+  try {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      return savedTheme;
+    }
+    
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
+  // Initialize theme on mount
   useEffect(() => {
-    try {
-      // Check if user has manually set a theme preference
-      const isManualTheme = localStorage.getItem('theme-manual') === 'true';
-      const savedTheme = localStorage.getItem('theme') as Theme | null;
-      
-      let initialTheme: Theme = 'light';
-      
-      // If user has manually set theme, always use saved theme (ignore system preference)
-      if (isManualTheme && savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-        initialTheme = savedTheme;
-      } else if (!isManualTheme) {
-        // Only use system preference if user hasn't manually set theme
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        initialTheme = prefersDark ? 'dark' : 'light';
-        // Save system preference to localStorage (but don't mark as manual)
-        localStorage.setItem('theme', initialTheme);
-      } else {
-        // Fallback to saved theme if exists
-        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-          initialTheme = savedTheme;
-        }
-      }
-      
-      setThemeState(initialTheme);
-      
-      // Apply theme immediately before React renders
-      const root = document.documentElement;
-      if (initialTheme === 'dark') {
-        root.classList.add('dark');
-        root.style.colorScheme = 'dark';
-      } else {
-        root.classList.remove('dark');
-        root.style.colorScheme = 'light';
-      }
-    } catch (error) {
-      console.error('Error initializing theme:', error);
-    } finally {
-      setMounted(true);
-    }
+    const initialTheme = getInitialTheme();
+    setThemeState(initialTheme);
+    applyTheme(initialTheme);
+    setMounted(true);
   }, []);
 
+  // Apply theme when it changes (after mount)
   useEffect(() => {
     if (!mounted) return;
+    applyTheme(theme);
     
     try {
-      // Apply theme to document root immediately
-      const root = document.documentElement;
-      if (theme === 'dark') {
-        root.classList.add('dark');
-        root.style.colorScheme = 'dark';
-      } else {
-        root.classList.remove('dark');
-        root.style.colorScheme = 'light';
-      }
-      
-      // Save to localStorage (only if already marked as manual, don't override)
-      // This effect runs when theme changes, but we don't want to mark as manual here
-      // because it might be from system preference sync
-      if (localStorage.getItem('theme-manual') === 'true') {
-        localStorage.setItem('theme', theme);
-      }
+      localStorage.setItem('theme', theme);
     } catch (error) {
-      console.error('Error applying theme:', error);
+      console.error('Error saving theme:', error);
     }
   }, [theme, mounted]);
 
   const toggleTheme = () => {
     setThemeState((prev) => {
       const newTheme = prev === 'light' ? 'dark' : 'light';
-      // Apply immediately for better UX
+      applyTheme(newTheme);
       try {
-        const root = document.documentElement;
-        if (newTheme === 'dark') {
-          root.classList.add('dark');
-          root.style.colorScheme = 'dark';
-        } else {
-          root.classList.remove('dark');
-          root.style.colorScheme = 'light';
-        }
-        // Mark as manually set and save theme
         localStorage.setItem('theme', newTheme);
-        localStorage.setItem('theme-manual', 'true');
       } catch (error) {
-        console.error('Error toggling theme:', error);
+        console.error('Error saving theme:', error);
       }
       return newTheme;
     });
@@ -109,21 +85,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    // Apply immediately
+    applyTheme(newTheme);
     try {
-      const root = document.documentElement;
-      if (newTheme === 'dark') {
-        root.classList.add('dark');
-        root.style.colorScheme = 'dark';
-      } else {
-        root.classList.remove('dark');
-        root.style.colorScheme = 'light';
-      }
-      // Mark as manually set and save theme
       localStorage.setItem('theme', newTheme);
-      localStorage.setItem('theme-manual', 'true');
     } catch (error) {
-      console.error('Error setting theme:', error);
+      console.error('Error saving theme:', error);
     }
   };
 

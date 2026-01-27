@@ -5,6 +5,7 @@
   },
   "form": {
     "title": "Transaction Parameters",
+    "description": "Fill in the following information to build and simulate transactions",
     "senderAddress": "Sender Address",
     "receiverAddress": "Receiver Address",
     "amount": "Transfer Amount (APT)",

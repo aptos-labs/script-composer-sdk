@@ -32,32 +32,24 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  const isManualTheme = localStorage.getItem('theme-manual') === 'true';
                   const savedTheme = localStorage.getItem('theme');
-                  
                   let theme = 'light';
                   
-                  // If user has manually set theme, always use saved theme (ignore system preference)
-                  if (isManualTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+                  if (savedTheme === 'dark' || savedTheme === 'light') {
                     theme = savedTheme;
-                  } else if (!isManualTheme) {
-                    // Only use system preference if user hasn't manually set theme
+                  } else {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     theme = prefersDark ? 'dark' : 'light';
-                    // Save system preference to localStorage (but don't mark as manual)
-                    localStorage.setItem('theme', theme);
-                  } else if (savedTheme === 'dark' || savedTheme === 'light') {
-                    // Fallback to saved theme if exists
-                    theme = savedTheme;
                   }
                   
                   const html = document.documentElement;
                   if (theme === 'dark') {
                     html.classList.add('dark');
+                    html.style.colorScheme = 'dark';
                   } else {
                     html.classList.remove('dark');
+                    html.style.colorScheme = 'light';
                   }
-                  html.style.colorScheme = theme;
                 } catch (e) {
                   // Ignore errors in initialization
                 }

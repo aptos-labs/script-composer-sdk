@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { AptosScriptComposer, BuildScriptComposerTransaction } from '../src/index';
+import { AptosScriptComposer, BuildScriptComposerTransaction, BuildScriptComposerMultiAgentTransaction } from '../src/index';
 import {
   AccountAddress,
   AccountAddressInput,
@@ -281,4 +281,137 @@ test('test composer fetch vs no-fetch behavior', async () => {
       },
     })
   ).rejects.toThrow('Module bytecode is required when auto-fetch is disabled');
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with secondary signers', async () => {
+  const secondarySignerAddresses = ['0x2', '0x3'];
+  
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    secondarySignerAddresses: secondarySignerAddresses,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(coin_module);
+      builder.storeModule(aptos_coin_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::coin::withdraw',
+        functionArguments: [CallArgument.newSigner(0), 1],
+        typeArguments: ['0x1::aptos_coin::AptosCoin'],
+        moduleAbi: coin_module.abi,
+        moduleBytecodes: [coin_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(2);
+  expect(txn.secondarySignerAddresses[0].toString()).toBe('0x2');
+  expect(txn.secondarySignerAddresses[1].toString()).toBe('0x3');
+  expect(txn.feePayerAddress).toBeUndefined();
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () => {
+  const feePayerAddress = '0x4';
+  
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    feePayerAddress: feePayerAddress,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(coin_module);
+      builder.storeModule(aptos_coin_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::coin::withdraw',
+        functionArguments: [CallArgument.newSigner(0), 1],
+        typeArguments: ['0x1::aptos_coin::AptosCoin'],
+        moduleAbi: coin_module.abi,
+        moduleBytecodes: [coin_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe('0x4');
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(0);
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with secondary signers and fee payer', async () => {
+  const secondarySignerAddresses = ['0x2', '0x3'];
+  const feePayerAddress = '0x4';
+  
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    secondarySignerAddresses: secondarySignerAddresses,
+    feePayerAddress: feePayerAddress,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(coin_module);
+      builder.storeModule(aptos_coin_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::coin::withdraw',
+        functionArguments: [CallArgument.newSigner(0), 1],
+        typeArguments: ['0x1::aptos_coin::AptosCoin'],
+        moduleAbi: coin_module.abi,
+        moduleBytecodes: [coin_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(2);
+  expect(txn.secondarySignerAddresses[0].toString()).toBe('0x2');
+  expect(txn.secondarySignerAddresses[1].toString()).toBe('0x3');
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe('0x4');
+});
+
+test('test BuildScriptComposerMultiAgentTransaction without optional parameters', async () => {
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(coin_module);
+      builder.storeModule(aptos_coin_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::coin::withdraw',
+        functionArguments: [CallArgument.newSigner(0), 1],
+        typeArguments: ['0x1::aptos_coin::AptosCoin'],
+        moduleAbi: coin_module.abi,
+        moduleBytecodes: [coin_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(0);
+  expect(txn.feePayerAddress).toBeUndefined();
 });

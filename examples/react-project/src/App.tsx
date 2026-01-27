@@ -10,6 +10,14 @@ import ThemeToggle from './components/ThemeToggle'
 
 type ViewType = 'simple' | 'multiAgent';
 
+/**
+ * Converts APT (decimal) to Octas (integer)
+ * 1 APT = 10^8 Octas = 100,000,000 Octas
+ */
+function aptToOctas(apt: number): number {
+  return Math.floor(apt * 100_000_000);
+}
+
 function App() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('simple');
@@ -29,6 +37,7 @@ function App() {
   // Generate code snippet based on current form state
   const codeSnippet = useMemo(() => {
     const amountNum = parseFloat(amount) || 1;
+    const amountInOctas = aptToOctas(amountNum);
     return `import { BuildScriptComposerTransaction, CallArgument, getModuleInner } from '@aptos-labs/script-composer-sdk';
 import { AptosConfig, Network, Aptos } from '@aptos-labs/ts-sdk';
 
@@ -51,7 +60,7 @@ async function buildAndSimulateTransaction() {
         functionArguments: [
           CallArgument.newSigner(0),
           "${receiverAddress.trim()}",
-          ${amountNum}
+          ${amountInOctas} // ${amountNum} APT = ${amountInOctas} Octas
         ],
         typeArguments: [],
         ${useCache ? `moduleAbi: aptos_account_module.abi,
@@ -110,6 +119,9 @@ async function buildAndSimulateTransaction() {
         return;
       }
 
+      // Convert APT to Octas (1 APT = 10^8 Octas)
+      const amountInOctas = aptToOctas(amountNum);
+
       let aptos_account_module: any;
       
       if (useCache) {
@@ -133,7 +145,7 @@ async function buildAndSimulateTransaction() {
             functionArguments: [
               CallArgument.newSigner(0),
               receiverAddress.trim(),
-              amountNum
+              amountInOctas
             ],
             typeArguments: [],
             moduleAbi: aptos_account_module?.abi,

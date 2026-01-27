@@ -4,7 +4,7 @@ import { AptosConfig, Network } from "@aptos-labs/ts-sdk"
 // Shared configuration
 const aptosConfig = new AptosConfig({ network: Network.TESTNET });
 
-// Example 1: Basic Multi-Agent Transaction (only sender, no secondary signers, no fee payer)
+// Example 1: Basic Multi-Agent Transaction (sender + secondary signers, no fee payer)
 async function exampleBasicMultiAgent() {
   console.log('\n=== Example 1: Basic Multi-Agent Transaction ===\n');
   

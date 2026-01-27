@@ -55,13 +55,13 @@ This example demonstrates four different multi-agent transaction scenarios:
 
 ### Example 1: Basic Multi-Agent Transaction
 
-Creates a multi-agent transaction with only a sender (no secondary signers, no fee payer). This demonstrates the minimal multi-agent transaction setup.
+Creates a multi-agent transaction with a sender and secondary signers (no fee payer). This demonstrates a basic multi-agent transaction setup with multiple signers.
 
 **Key Features:**
-- Single sender
-- No secondary signers
+- Primary sender
+- One secondary signer
 - No fee payer
-- Minimal configuration
+- Basic multi-agent configuration
 
 **Use Cases:**
 - Testing multi-agent transaction structure
@@ -86,12 +86,12 @@ Creates a multi-agent transaction with a sender and multiple secondary signers. 
 
 ### Example 3: Multi-Agent with Fee Payer (Sponsored Transaction)
 
-Creates a multi-agent transaction with a sender and a fee payer. This demonstrates sponsored transaction pattern where a third party pays for gas.
+Creates a multi-agent transaction with a sender, secondary signers, and a fee payer. This demonstrates sponsored transaction pattern where a third party pays for gas.
 
 **Key Features:**
 - Primary sender
+- One secondary signer
 - Fee payer (sponsor)
-- No secondary signers
 - Gas fees paid by sponsor
 
 **Use Cases:**

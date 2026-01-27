@@ -7,6 +7,14 @@ import { useTranslation } from 'react-i18next';
 
 type ScenarioType = 'basic' | 'secondary' | 'feePayer' | 'complete';
 
+/**
+ * Converts APT (decimal) to Octas (integer)
+ * 1 APT = 10^8 Octas = 100,000,000 Octas
+ */
+function aptToOctas(apt: number): number {
+  return Math.floor(apt * 100_000_000);
+}
+
 export default function MultiAgentDemo() {
   const { t } = useTranslation();
   const [scenario, setScenario] = useState<ScenarioType>('basic');
@@ -44,6 +52,7 @@ export default function MultiAgentDemo() {
   // Generate code snippet based on current form state and scenario
   const codeSnippet = useMemo(() => {
     const amountNum = parseFloat(amount) || 1;
+    const amountInOctas = aptToOctas(amountNum);
     const validSigners = secondarySigners.filter(addr => addr.trim() !== '');
     const hasSecondarySigners = (scenario === 'secondary' || scenario === 'complete') && validSigners.length > 0;
     const hasFeePayer = (scenario === 'feePayer' || scenario === 'complete') && feePayerAddress.trim();
@@ -81,7 +90,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
         functionArguments: [
           CallArgument.newSigner(0),
           "${receiverAddress.trim()}",
-          ${amountNum}
+          ${amountInOctas} // ${amountNum} APT = ${amountInOctas} Octas
         ],
         typeArguments: [],
         options: {
@@ -133,6 +142,9 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
         return;
       }
 
+      // Convert APT to Octas (1 APT = 10^8 Octas)
+      const amountInOctas = aptToOctas(amountNum);
+
       // Validate based on scenario
       if ((scenario === 'secondary' || scenario === 'complete') && getValidSecondarySigners().length === 0) {
         setError(t('errors.addSecondarySigner'));
@@ -171,7 +183,7 @@ ${secondarySignersCode}${feePayerCode}    builder: async (composer) => {
             functionArguments: [
               CallArgument.newSigner(0),
               receiverAddress.trim(),
-              amountNum
+              amountInOctas
             ],
             typeArguments: [],
             options: {

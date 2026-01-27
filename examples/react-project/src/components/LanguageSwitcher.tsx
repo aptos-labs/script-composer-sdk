@@ -1,11 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 
-// Normalize language code to 'en' or 'zh'
 const normalizeLanguage = (lang: string): 'en' | 'zh' => {
   if (lang.startsWith('zh')) return 'zh';
   return 'en';
 };
+
+const languages = [
+  { code: 'en' as const, name: 'English', display: 'EN' },
+  { code: 'zh' as const, name: '中文', display: '中文' },
+] as const;
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -13,16 +17,14 @@ export default function LanguageSwitcher() {
   const [currentLang, setCurrentLang] = useState<'en' | 'zh'>(() => normalizeLanguage(i18n.language));
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const changeLanguage = (lng: string) => {
-    const normalizedLang = normalizeLanguage(lng);
-    i18n.changeLanguage(normalizedLang);
-    setCurrentLang(normalizedLang);
+  const handleLanguageChange = (langCode: 'en' | 'zh') => {
+    i18n.changeLanguage(langCode);
+    setCurrentLang(langCode);
     setIsOpen(false);
   };
 
   // Normalize language on mount and listen to language changes
   useEffect(() => {
-    // Normalize initial language if needed
     const normalized = normalizeLanguage(i18n.language);
     if (i18n.language !== normalized) {
       i18n.changeLanguage(normalized);
@@ -31,8 +33,7 @@ export default function LanguageSwitcher() {
     }
 
     const handleLanguageChanged = (lng: string) => {
-      const normalized = normalizeLanguage(lng);
-      setCurrentLang(normalized);
+      setCurrentLang(normalizeLanguage(lng));
     };
 
     i18n.on('languageChanged', handleLanguageChanged);
@@ -41,15 +42,10 @@ export default function LanguageSwitcher() {
     };
   }, [i18n]);
 
-  const languages = [
-    { code: 'en' as const, name: 'English', display: 'EN' },
-    { code: 'zh' as const, name: '中文', display: '中文' },
-  ];
-
-  const currentLanguage = languages.find(lang => lang.code === currentLang) || languages[0];
-
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside (only when open)
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -60,7 +56,9 @@ export default function LanguageSwitcher() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isOpen]);
+
+  const currentLanguage = languages.find(lang => lang.code === currentLang) || languages[0];
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
@@ -90,7 +88,7 @@ export default function LanguageSwitcher() {
           {languages.map((lang) => (
             <button
               key={lang.code}
-              onClick={() => changeLanguage(lang.code)}
+              onClick={() => handleLanguageChange(lang.code)}
               className={`w-full px-4 py-2.5 text-left text-sm transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg ${
                 currentLang === lang.code
                   ? 'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold'
