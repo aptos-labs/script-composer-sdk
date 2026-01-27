@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, beforeAll } from 'vitest';
 import { AptosScriptComposer, BuildScriptComposerTransaction, BuildScriptComposerMultiAgentTransaction } from '../src/index';
 import {
   AccountAddress,
@@ -28,28 +28,63 @@ async function getModuleInner(args: {
   return data;
 }
 
-const coin_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'coin',
-});
+// Module variables - will be initialized in beforeAll
+let coin_module: MoveModuleBytecode;
+let fa_module: MoveModuleBytecode;
+let aptos_coin_module: MoveModuleBytecode;
+let primary_fungible_store_module: MoveModuleBytecode;
+let aptos_account_module: MoveModuleBytecode;
 
-const fa_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'fungible_asset',
-});
+// Flag to track if modules were successfully loaded
+let modulesLoaded = false;
 
-const aptos_coin_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'aptos_coin',
-});
+beforeAll(async () => {
+  try {
+    const aptosConfig = new AptosConfig({ network: Network.TESTNET });
+    
+    coin_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'coin',
+    });
 
-const primary_fungible_store_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'primary_fungible_store',
+    fa_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'fungible_asset',
+    });
+
+    aptos_coin_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'aptos_coin',
+    });
+
+    primary_fungible_store_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'primary_fungible_store',
+    });
+
+    aptos_account_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'aptos_account',
+    });
+
+    modulesLoaded = true;
+  } catch (error: any) {
+    console.error('Failed to load modules from Aptos Testnet:', error);
+    modulesLoaded = false;
+    const errorMessage = error?.message || String(error);
+    if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('getaddrinfo')) {
+      throw new Error(
+        'Network error: Could not connect to Aptos Testnet. ' +
+        'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.'
+      );
+    }
+    throw new Error(`Failed to load test modules: ${errorMessage}`);
+  }
 });
 
 test('test composer', () => {
@@ -291,18 +326,17 @@ test('test BuildScriptComposerMultiAgentTransaction with secondary signers', asy
     secondarySignerAddresses: secondarySignerAddresses,
     aptosConfig: new AptosConfig({ network: Network.TESTNET }),
     builder: async (builder) => {
-      builder.storeModule(coin_module);
-      builder.storeModule(aptos_coin_module);
+      builder.storeModule(aptos_account_module);
 
       await builder.addBatchedCalls({
-        function: '0x1::coin::withdraw',
-        functionArguments: [CallArgument.newSigner(0), 1],
-        typeArguments: ['0x1::aptos_coin::AptosCoin'],
-        moduleAbi: coin_module.abi,
-        moduleBytecodes: [coin_module.bytecode],
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        },
+        }
       });
 
       return builder;
@@ -325,18 +359,17 @@ test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () =>
     feePayerAddress: feePayerAddress,
     aptosConfig: new AptosConfig({ network: Network.TESTNET }),
     builder: async (builder) => {
-      builder.storeModule(coin_module);
-      builder.storeModule(aptos_coin_module);
+      builder.storeModule(aptos_account_module);
 
       await builder.addBatchedCalls({
-        function: '0x1::coin::withdraw',
-        functionArguments: [CallArgument.newSigner(0), 1],
-        typeArguments: ['0x1::aptos_coin::AptosCoin'],
-        moduleAbi: coin_module.abi,
-        moduleBytecodes: [coin_module.bytecode],
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        },
+        }
       });
 
       return builder;
@@ -360,18 +393,17 @@ test('test BuildScriptComposerMultiAgentTransaction with secondary signers and f
     feePayerAddress: feePayerAddress,
     aptosConfig: new AptosConfig({ network: Network.TESTNET }),
     builder: async (builder) => {
-      builder.storeModule(coin_module);
-      builder.storeModule(aptos_coin_module);
+      builder.storeModule(aptos_account_module);
 
       await builder.addBatchedCalls({
-        function: '0x1::coin::withdraw',
-        functionArguments: [CallArgument.newSigner(0), 1],
-        typeArguments: ['0x1::aptos_coin::AptosCoin'],
-        moduleAbi: coin_module.abi,
-        moduleBytecodes: [coin_module.bytecode],
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        },
+        }
       });
 
       return builder;
@@ -392,18 +424,17 @@ test('test BuildScriptComposerMultiAgentTransaction without optional parameters'
     sender: AccountAddress.ONE,
     aptosConfig: new AptosConfig({ network: Network.TESTNET }),
     builder: async (builder) => {
-      builder.storeModule(coin_module);
-      builder.storeModule(aptos_coin_module);
+      builder.storeModule(aptos_account_module);
 
       await builder.addBatchedCalls({
-        function: '0x1::coin::withdraw',
-        functionArguments: [CallArgument.newSigner(0), 1],
-        typeArguments: ['0x1::aptos_coin::AptosCoin'],
-        moduleAbi: coin_module.abi,
-        moduleBytecodes: [coin_module.bytecode],
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
         options: {
           allowFetch: false,
-        },
+        }
       });
 
       return builder;
