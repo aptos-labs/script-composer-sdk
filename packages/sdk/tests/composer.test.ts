@@ -245,6 +245,34 @@ test('test composer build Txn', async () => {
   expect(txn).toBeDefined();
 });
 
+test('test BuildScriptComposerTransaction with fee payer', async () => {
+  const txn = await BuildScriptComposerTransaction({
+    sender: AccountAddress.ONE,
+    withFeePayer: true,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe(AccountAddress.ZERO.toString());
+});
+
 test('test composer with fetch enabled', async () => {
   const builder = new AptosScriptComposer(new AptosConfig({ network: Network.TESTNET }));
 
