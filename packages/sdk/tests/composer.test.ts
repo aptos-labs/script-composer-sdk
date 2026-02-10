@@ -1,5 +1,9 @@
-import { expect, test } from 'vitest';
-import { AptosScriptComposer, BuildScriptComposerTransaction } from '../src/index';
+import { expect, test, beforeAll } from 'vitest';
+import {
+  AptosScriptComposer,
+  BuildScriptComposerTransaction,
+  BuildScriptComposerMultiAgentTransaction,
+} from '../src/index';
 import {
   AccountAddress,
   AccountAddressInput,
@@ -28,28 +32,57 @@ async function getModuleInner(args: {
   return data;
 }
 
-const coin_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'coin',
-});
+// Module variables - will be initialized in beforeAll
+let coin_module: MoveModuleBytecode;
+let fa_module: MoveModuleBytecode;
+let aptos_coin_module: MoveModuleBytecode;
+let primary_fungible_store_module: MoveModuleBytecode;
+let aptos_account_module: MoveModuleBytecode;
 
-const fa_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'fungible_asset',
-});
+beforeAll(async () => {
+  try {
+    const aptosConfig = new AptosConfig({ network: Network.TESTNET });
 
-const aptos_coin_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'aptos_coin',
-});
+    coin_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'coin',
+    });
 
-const primary_fungible_store_module = await getModuleInner({
-  aptosConfig: new AptosConfig({ network: Network.TESTNET }),
-  accountAddress: '0x1',
-  moduleName: 'primary_fungible_store',
+    fa_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'fungible_asset',
+    });
+
+    aptos_coin_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'aptos_coin',
+    });
+
+    primary_fungible_store_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'primary_fungible_store',
+    });
+
+    aptos_account_module = await getModuleInner({
+      aptosConfig,
+      accountAddress: '0x1',
+      moduleName: 'aptos_account',
+    });
+  } catch (error: unknown) {
+    console.error('Failed to load modules from Aptos Testnet:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('getaddrinfo')) {
+      throw new Error(
+        'Network error: Could not connect to Aptos Testnet. ' +
+          'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.'
+      );
+    }
+    throw new Error(`Failed to load test modules: ${errorMessage}`);
+  }
 });
 
 test('test composer', () => {
@@ -212,6 +245,34 @@ test('test composer build Txn', async () => {
   expect(txn).toBeDefined();
 });
 
+test('test BuildScriptComposerTransaction with fee payer', async () => {
+  const txn = await BuildScriptComposerTransaction({
+    sender: AccountAddress.ONE,
+    withFeePayer: true,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe(AccountAddress.ZERO.toString());
+});
+
 test('test composer with fetch enabled', async () => {
   const builder = new AptosScriptComposer(new AptosConfig({ network: Network.TESTNET }));
 
@@ -281,4 +342,133 @@ test('test composer fetch vs no-fetch behavior', async () => {
       },
     })
   ).rejects.toThrow('Module bytecode is required when auto-fetch is disabled');
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with secondary signers', async () => {
+  const secondarySignerAddresses = ['0x2', '0x3'];
+
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    secondarySignerAddresses: secondarySignerAddresses,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(2);
+  expect(txn.secondarySignerAddresses[0].toString()).toBe('0x2');
+  expect(txn.secondarySignerAddresses[1].toString()).toBe('0x3');
+  expect(txn.feePayerAddress).toBeUndefined();
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with fee payer', async () => {
+  const feePayerAddress = '0x4';
+
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    feePayerAddress: feePayerAddress,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe('0x4');
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(0);
+});
+
+test('test BuildScriptComposerMultiAgentTransaction with secondary signers and fee payer', async () => {
+  const secondarySignerAddresses = ['0x2', '0x3'];
+  const feePayerAddress = '0x4';
+
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    secondarySignerAddresses: secondarySignerAddresses,
+    feePayerAddress: feePayerAddress,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(2);
+  expect(txn.secondarySignerAddresses[0].toString()).toBe('0x2');
+  expect(txn.secondarySignerAddresses[1].toString()).toBe('0x3');
+  expect(txn.feePayerAddress).toBeDefined();
+  expect(txn.feePayerAddress?.toString()).toBe('0x4');
+});
+
+test('test BuildScriptComposerMultiAgentTransaction without optional parameters', async () => {
+  const txn = await BuildScriptComposerMultiAgentTransaction({
+    sender: AccountAddress.ONE,
+    aptosConfig: new AptosConfig({ network: Network.TESTNET }),
+    builder: async (builder) => {
+      builder.storeModule(aptos_account_module);
+
+      await builder.addBatchedCalls({
+        function: '0x1::aptos_account::transfer',
+        functionArguments: [CallArgument.newSigner(0), '0x2', 1],
+        typeArguments: [],
+        moduleAbi: aptos_account_module.abi,
+        moduleBytecodes: [aptos_account_module.bytecode],
+        options: {
+          allowFetch: false,
+        },
+      });
+
+      return builder;
+    },
+  });
+
+  expect(txn).toBeDefined();
+  expect(txn.secondarySignerAddresses).toBeDefined();
+  expect(txn.secondarySignerAddresses.length).toBe(0);
+  expect(txn.feePayerAddress).toBeUndefined();
 });
