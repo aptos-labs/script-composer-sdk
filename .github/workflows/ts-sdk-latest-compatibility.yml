@@ -45,6 +45,13 @@ jobs:
       - name: Show resolved @aptos-labs/ts-sdk versions
         run: pnpm -r list @aptos-labs/ts-sdk --depth 0
 
+      - name: Ensure lockfile has only latest @aptos-labs/ts-sdk
+        run: |
+          LATEST="$(pnpm view @aptos-labs/ts-sdk version)"
+          echo "Latest @aptos-labs/ts-sdk: ${LATEST}"
+          export LATEST
+          node -e "const fs=require('fs');const latest=process.env.LATEST;const lock=fs.readFileSync('pnpm-lock.yaml','utf8');const matches=[...lock.matchAll(/'@aptos-labs\\/ts-sdk@([^']+)'/g)];const versions=[...new Set(matches.map((m)=>m[1].split('(')[0]))].sort();console.log('Resolved versions:',versions.join(', ')||'(none)');const old=versions.filter((v)=>v!==latest);if(old.length){console.error('Found non-latest versions:',old.join(', '));process.exit(1);}"
+
       - name: Build all packages
         run: pnpm build
 
