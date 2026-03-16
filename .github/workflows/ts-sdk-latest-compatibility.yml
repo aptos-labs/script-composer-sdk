@@ -1,0 +1,52 @@
+name: TS SDK Latest Compatibility
+
+on:
+  schedule:
+    # Every day at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ts-sdk-latest-compatibility-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+
+jobs:
+  build-and-test-with-latest-ts-sdk:
+    name: Build and Test with latest @aptos-labs/ts-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Setup pnpm 10.11.0
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Upgrade @aptos-labs/ts-sdk to latest across workspace
+        run: pnpm -r up @aptos-labs/ts-sdk@latest
+
+      - name: Show resolved @aptos-labs/ts-sdk versions
+        run: pnpm -r list @aptos-labs/ts-sdk --depth 0
+
+      - name: Build all packages
+        run: pnpm build
+
+      - name: Run all tests
+        run: pnpm test
