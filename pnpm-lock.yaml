@@ -174,7 +174,7 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@6.2.0(got@11.8.6))
       '@aptos-labs/ts-sdk':
-        specifier: ^6.2.0
+        specifier: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
         version: 6.2.0(got@11.8.6)
       buffer:
         specifier: ^6.0.3
