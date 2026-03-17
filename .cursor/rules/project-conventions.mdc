@@ -1,0 +1,11 @@
+---
+description: Monorepo layout, pnpm, build/test commands, and Aptos Script Composer terminology
+alwaysApply: true
+---
+
+# Script Composer SDK — Project Conventions
+
+- This repo is a **pnpm workspace**: `packages/*` (SDK) and `examples/*` (apps). Root has no application source, only workspace scripts and config.
+- **Build and test from root**: `pnpm build`, `pnpm test`. Do not assume running build/test from a subpackage is the default; prefer root for full workspace consistency.
+- **Terminology**: "Script Composer" and "AptosScriptComposer" refer to the SDK. "Multi-agent" here means **Aptos multi-signer or fee-payer transactions**, not AI/LLM agents. Use "multi-signer" or "fee payer" when disambiguation is needed.
+- For project overview, structure, and commands, see [AGENTS.md](/AGENTS.md) at repo root.
