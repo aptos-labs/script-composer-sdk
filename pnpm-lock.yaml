@@ -167,9 +167,6 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer':
-        specifier: ^0.1.6
-        version: 0.1.6
       '@aptos-labs/script-composer-pack':
         specifier: ^0.2.3
         version: 0.2.3(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@6.2.0(got@11.8.6))
