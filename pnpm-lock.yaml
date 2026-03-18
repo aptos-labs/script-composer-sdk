@@ -14,8 +14,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^5.1.0
-        version: 5.2.1(got@11.8.6)
+        specifier: ^6.2.0
+        version: 6.2.0(got@11.8.6)
     devDependencies:
       tsx:
         specifier: ^4.20.6
@@ -30,8 +30,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^5.1.0
-        version: 5.2.1(got@11.8.6)
+        specifier: ^6.2.0
+        version: 6.2.0(got@11.8.6)
       '@keyv/offline':
         specifier: ^4.0.2
         version: 4.0.2
@@ -82,8 +82,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^5.1.0
-        version: 5.2.1(got@11.8.6)
+        specifier: ^6.2.0
+        version: 6.2.0(got@11.8.6)
     devDependencies:
       tsx:
         specifier: ^4.20.6
@@ -98,8 +98,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^5.1.0
-        version: 5.2.1(got@11.8.6)
+        specifier: ^6.2.0
+        version: 6.2.0(got@11.8.6)
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -168,11 +168,11 @@ importers:
   packages/sdk:
     dependencies:
       '@aptos-labs/script-composer-pack':
-        specifier: ^0.2.1
-        version: 0.2.1(@aptos-labs/aptos-dynamic-transaction-composer@0.1.5)(@aptos-labs/ts-sdk@5.2.1(got@11.8.6))
+        specifier: ^0.2.3
+        version: 0.2.3(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@6.2.0(got@11.8.6))
       '@aptos-labs/ts-sdk':
-        specifier: ^3.0.0 || ^4.0.0 || ^5.0.0
-        version: 5.2.1(got@11.8.6)
+        specifier: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+        version: 6.2.0(got@11.8.6)
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -214,8 +214,8 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@aptos-labs/aptos-cli@1.0.2':
-    resolution: {integrity: sha512-PYPsd0Kk3ynkxNfe3S4fanI3DiUICCoh4ibQderbvjPFL5A0oK6F4lPEO2t0MDsQySTk2t4vh99Xjy6Bd9y+aQ==}
+  '@aptos-labs/aptos-cli@1.1.1':
+    resolution: {integrity: sha512-sB7CokCM6s76SLJmccysbnFR+MDik6udKfj2+9ZsmTLV0/t73veIeCDKbvWJmbW267ibx4HiGbPI7L+1+yjEbQ==}
     hasBin: true
 
   '@aptos-labs/aptos-client@2.1.0':
@@ -224,17 +224,17 @@ packages:
     peerDependencies:
       got: ^11.8.6
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.5':
-    resolution: {integrity: sha512-Xs8BSCcL4hnpYONFC2e2Kj/vqvMVJU9l70vN0RNMagYLsvyiyNgUo55I+5uCrhIgj68bgxFsSoKUh/XDpDqRiw==}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.6':
+    resolution: {integrity: sha512-reIq7g/J02nRT6XILCX51zA9n7n0lwxZQB56fVaE2D3WB5Lt6qgw71ITlt2mvng/x/r8gY7bYyyUhKAx4hMuBw==}
 
-  '@aptos-labs/script-composer-pack@0.2.1':
-    resolution: {integrity: sha512-5cG2I2QwQlHhuxkvEF9WY8ctwsNM6SYT6JcnsNK9T0o1cItmLUXf2TF+4MRlOUdh3WbhOSY1EWm9BbLQl/IXAQ==}
+  '@aptos-labs/script-composer-pack@0.2.3':
+    resolution: {integrity: sha512-eBznXyjgp/1ubqIIibsdmYhscmaglhxqV0E553aOlpvXrdEZtA6C9rq/E3UHW4XFJvhAZC9eWXGdfQib1FojYg==}
     peerDependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.5
-      '@aptos-labs/ts-sdk': ^3.0.0 || ^4.0.0 || ^5.0.0
+      '@aptos-labs/aptos-dynamic-transaction-composer': ^0.1.6
+      '@aptos-labs/ts-sdk': ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
-  '@aptos-labs/ts-sdk@5.2.1':
-    resolution: {integrity: sha512-kazYjqfsPCBx2UJI+nYUOb6Ov7q7brSgYEfxp2sP27IeJWdDNa50lfs0WIpDJ92kQxdtlm9q3ZWw7Toh9f1gxQ==}
+  '@aptos-labs/ts-sdk@6.2.0':
+    resolution: {integrity: sha512-DXzftTnIONrerI1X2Gfc/OFwrUoMXIKjDuupBuU0F67W5wrq9xyM5qB6Q89Biub6A3M3Y4kS96x84VH5CN2anA==}
     engines: {node: '>=20.0.0'}
 
   '@babel/code-frame@7.28.6':
@@ -2273,8 +2273,8 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
 
-  eventemitter3@5.0.1:
-    resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+  eventemitter3@5.0.4:
+    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   expect-type@1.2.1:
     resolution: {integrity: sha512-/kP8CAwxzLVEeFrMm4kMmy4CCDlpipyA7MYLVrdJIkV0fYF0UaigQHRsxHiuY/GEea+bh4KSv3TIlgr+2UL6bw==}
@@ -3715,7 +3715,7 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@aptos-labs/aptos-cli@1.0.2':
+  '@aptos-labs/aptos-cli@1.1.1':
     dependencies:
       commander: 12.1.0
 
@@ -3723,22 +3723,22 @@ snapshots:
     dependencies:
       got: 11.8.6
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.5': {}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.6': {}
 
-  '@aptos-labs/script-composer-pack@0.2.1(@aptos-labs/aptos-dynamic-transaction-composer@0.1.5)(@aptos-labs/ts-sdk@5.2.1(got@11.8.6))':
+  '@aptos-labs/script-composer-pack@0.2.3(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@6.2.0(got@11.8.6))':
     dependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.5
-      '@aptos-labs/ts-sdk': 5.2.1(got@11.8.6)
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.6
+      '@aptos-labs/ts-sdk': 6.2.0(got@11.8.6)
 
-  '@aptos-labs/ts-sdk@5.2.1(got@11.8.6)':
+  '@aptos-labs/ts-sdk@6.2.0(got@11.8.6)':
     dependencies:
-      '@aptos-labs/aptos-cli': 1.0.2
+      '@aptos-labs/aptos-cli': 1.1.1
       '@aptos-labs/aptos-client': 2.1.0(got@11.8.6)
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      eventemitter3: 5.0.1
+      eventemitter3: 5.0.4
       js-base64: 3.7.7
       jwt-decode: 4.0.0
       poseidon-lite: 0.2.1
@@ -5808,7 +5808,7 @@ snapshots:
 
   esutils@2.0.3: {}
 
-  eventemitter3@5.0.1: {}
+  eventemitter3@5.0.4: {}
 
   expect-type@1.2.1: {}
 

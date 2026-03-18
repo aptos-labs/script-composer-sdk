@@ -1,0 +1,5 @@
+# Script Composer SDK — AI coding assistant instructions
+
+This file is for AI coding tools that read root-level instructions. The full, authoritative guide is **AGENTS.md** in the repo root; prefer that file.
+
+Summary: pnpm workspace; run `pnpm build` and `pnpm test` from the root. In this repo "multi-agent" means Aptos multi-signer / fee-payer transactions, not AI multi-agent systems. See [AGENTS.md](AGENTS.md).

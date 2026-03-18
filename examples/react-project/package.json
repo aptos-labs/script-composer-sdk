@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@aptos-labs/script-composer-sdk": "workspace:*",
-    "@aptos-labs/ts-sdk": "^5.1.0",
+    "@aptos-labs/ts-sdk": "^6.2.0",
     "buffer": "^6.0.3",
     "i18next": "^25.8.0",
     "i18next-browser-languagedetector": "^8.2.0",
