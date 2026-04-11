@@ -12,7 +12,7 @@
     "@aptos-labs/script-composer-sdk": "workspace:*",
     "@aptos-labs/ts-sdk": "^6.2.0",
     "@keyv/offline": "^4.0.2",
-    "next": "^16.1.5",
+    "next": "^16.2.3",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
