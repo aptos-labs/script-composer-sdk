@@ -5,7 +5,13 @@
   "description": "Script Composer SDK and Examples",
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "publish-packages": "changeset version && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7"
   },
   "keywords": [],
   "author": "",
