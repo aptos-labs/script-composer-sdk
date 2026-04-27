@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "*.*.*"
+      - "v*.*.*-beta.*"
+      - "*.*.*-beta.*"
+      - "test-v*.*.*-test.*"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag, or SHA to release from (default main)
+        required: false
+        default: main
+        type: string
+      dry_run:
+        description: Run dry-run instead of real publish
+        required: false
+        default: true
+        type: boolean
+      confirm_publish:
+        description: For real manual publish, must be exactly publish
+        required: false
+        default: ""
+        type: string
+      confirm_version:
+        description: For real manual publish, must equal packages/sdk version
+        required: false
+        default: ""
+        type: string
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/release-reusable.yml
+    with:
+      package_dir: packages/sdk
+      dry_run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
+      expected_tag: ${{ github.event_name == 'push' && github.ref_name || '' }}
+      allow_tag_prefix_v: true
+      allow_tag_prefix_test_v: true
+      allow_non_main: false
+      main_branch: main
+      env_name: npm-release
+      require_manual_confirm: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run }}
+      confirm_publish: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_publish || '' }}
+      confirm_version: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_version || '' }}
+      run_tests: true
+      publish_access: public
