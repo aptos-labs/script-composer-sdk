@@ -2,6 +2,10 @@
   "name": "@aptos-labs/script-composer-sdk",
   "version": "0.3.4-beta.1",
   "description": "Script Composer SDK",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aptos-labs/script-composer-sdk"
+  },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "type": "module",
