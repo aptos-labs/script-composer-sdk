@@ -8,8 +8,8 @@
     "dev": "tsx watch index.ts"
   },
   "dependencies": {
-    "@aptos-labs/script-composer-sdk": "workspace:*",
-    "@aptos-labs/ts-sdk": "^6.2.0"
+    "@aptos-labs/ts-sdk": "^7.1.0",
+    "@aptos-labs/script-composer-sdk": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
