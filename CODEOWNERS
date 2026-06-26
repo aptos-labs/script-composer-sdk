@@ -1,4 +1,4 @@
-# **Please** keep this file ordered alphabetically by directory paths.
+# Keep entries ordered from broad to specific; the last matching pattern takes precedence (do not reorder purely alphabetically).
 
 # Auto-reviewers for all code
 * @aptos-labs/developer-platform
