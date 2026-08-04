@@ -4,7 +4,7 @@ This example demonstrates how to use the Script Composer SDK in a Node.js enviro
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js 22 or later
 - npm or yarn
 
 ## Installation

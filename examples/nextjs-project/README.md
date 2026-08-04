@@ -4,7 +4,7 @@ This is an example project demonstrating how to use Script Composer with Next.js
 
 ## Prerequisites
 
-- Node.js 18.x or later
+- Node.js 22 or later
 - pnpm (recommended), npm, or yarn
 
 ## Installation

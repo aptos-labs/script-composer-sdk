@@ -2,6 +2,10 @@
 
 This is an example project demonstrating how to use the Script Composer SDK in a React application. This example uses Vite as the build tool and includes TypeScript support.
 
+## Prerequisites
+
+- Node.js 22 or later
+
 ## Getting Started
 
 1. Install dependencies:
