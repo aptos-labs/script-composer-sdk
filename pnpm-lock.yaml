@@ -171,9 +171,12 @@ importers:
 
   packages/sdk:
     dependencies:
+      '@aptos-labs/aptos-dynamic-transaction-composer':
+        specifier: ^0.1.7
+        version: 0.1.7
       '@aptos-labs/script-composer-pack':
         specifier: ^0.2.4
-        version: 0.2.4(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@7.2.0)
+        version: 0.2.4(@aptos-labs/aptos-dynamic-transaction-composer@0.1.7)(@aptos-labs/ts-sdk@7.2.0)
       '@aptos-labs/ts-sdk':
         specifier: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
         version: 7.2.0
@@ -229,8 +232,8 @@ packages:
     resolution: {integrity: sha512-QNr8OV3b6oZB+5LSh86wee9RbK+FAYCKh0wvu3epSf5JJnHezszpnAgtr3DJGBG6t00MJHaiu6VUbmujrl97iQ==}
     engines: {node: '>=22.0.0'}
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.6':
-    resolution: {integrity: sha512-reIq7g/J02nRT6XILCX51zA9n7n0lwxZQB56fVaE2D3WB5Lt6qgw71ITlt2mvng/x/r8gY7bYyyUhKAx4hMuBw==}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.7':
+    resolution: {integrity: sha512-fbSR0YW+bpPvZMNgKl5SDn8rzs7QOp9uA4NMh0yeaoAUiJx44tEE36YPixm5nY2qcC6YMt1pTs3Lkf8SgOBmVQ==}
 
   '@aptos-labs/script-composer-pack@0.2.4':
     resolution: {integrity: sha512-BZPauVd9OwtikV8/r2iDjXSFDfx1LdRmqt1Bk1Nxk+ilTW8ixSJWebMF5zq5ZbjVODqMR2YWoMbVAvoUNlrfCQ==}
@@ -4219,11 +4222,11 @@ snapshots:
     dependencies:
       got: 15.1.0
 
-  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.6': {}
+  '@aptos-labs/aptos-dynamic-transaction-composer@0.1.7': {}
 
-  '@aptos-labs/script-composer-pack@0.2.4(@aptos-labs/aptos-dynamic-transaction-composer@0.1.6)(@aptos-labs/ts-sdk@7.2.0)':
+  '@aptos-labs/script-composer-pack@0.2.4(@aptos-labs/aptos-dynamic-transaction-composer@0.1.7)(@aptos-labs/ts-sdk@7.2.0)':
     dependencies:
-      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.6
+      '@aptos-labs/aptos-dynamic-transaction-composer': 0.1.7
       '@aptos-labs/ts-sdk': 7.2.0
 
   '@aptos-labs/ts-sdk@7.2.0':
