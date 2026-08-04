@@ -1,6 +1,6 @@
 {
   "name": "@aptos-labs/script-composer-sdk",
-  "version": "0.3.4-beta.1",
+  "version": "0.3.5",
   "description": "Script Composer SDK",
   "repository": {
     "type": "git",
@@ -41,8 +41,9 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "@aptos-labs/script-composer-pack": "^0.2.3",
-    "@aptos-labs/ts-sdk": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0",
+    "@aptos-labs/aptos-dynamic-transaction-composer": "^0.1.7",
+    "@aptos-labs/script-composer-pack": "^0.2.4",
+    "@aptos-labs/ts-sdk": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0",
     "buffer": "^6.0.3"
   },
   "devDependencies": {

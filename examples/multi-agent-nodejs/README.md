@@ -11,7 +11,7 @@ Multi-agent transactions are a powerful feature of the Aptos blockchain that ena
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js 22 or later
 - npm, yarn, or pnpm
 - Access to Aptos Testnet (for testing)
 
