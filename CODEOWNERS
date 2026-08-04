@@ -1,0 +1,8 @@
+# Keep entries ordered from broad to specific; the last matching pattern takes precedence (do not reorder purely alphabetically).
+
+# Auto-reviewers for all code
+* @aptos-labs/developer-platform
+
+# Owners for the `.github` directory and all its subdirectories.
+
+/.github/ @aptos-labs/developer-platform @aptos-labs/security
