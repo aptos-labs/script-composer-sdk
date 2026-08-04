@@ -1,6 +1,6 @@
 {
   "name": "@aptos-labs/script-composer-sdk",
-  "version": "0.3.4-beta.1",
+  "version": "0.3.5",
   "description": "Script Composer SDK",
   "repository": {
     "type": "git",
