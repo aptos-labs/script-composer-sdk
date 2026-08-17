@@ -1,7 +1,7 @@
 {
   "name": "@aptos-labs/script-composer-sdk",
   "version": "0.3.5",
-  "description": "Script Composer SDK",
+  "description": "Compose multiple Aptos Move calls into a single transaction",
   "repository": {
     "type": "git",
     "url": "https://github.com/aptos-labs/script-composer-sdk"
@@ -25,6 +25,7 @@
   },
   "files": [
     "dist",
+    "README.md",
     "package.json"
   ],
   "scripts": {
@@ -37,8 +38,16 @@
     "fmt": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "fmt:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "aptos",
+    "move",
+    "blockchain",
+    "transactions",
+    "transaction-composer",
+    "multi-agent",
+    "fee-payer"
+  ],
+  "author": "Aptos Labs",
   "license": "ISC",
   "peerDependencies": {
     "@aptos-labs/aptos-dynamic-transaction-composer": "^0.1.7",
@@ -57,5 +66,9 @@
     "tsup": "8.5.0",
     "typescript": "5.8.3",
     "vitest": "3.2.6"
+  },
+  "homepage": "https://github.com/aptos-labs/script-composer-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/aptos-labs/script-composer-sdk/issues"
   }
 }
