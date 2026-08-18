@@ -1,53 +1,52 @@
-# Script Composer SDK Node.js Example
+# Node.js quick start
 
-This example demonstrates how to use the Script Composer SDK in a Node.js environment to build and simulate transactions on the Aptos blockchain.
+This runnable quick start composes `0x1::aptos_account::transfer` and simulates it on Aptos Testnet. It runs the same transaction twice:
+
+1. **Preloaded module:** fetches `0x1::aptos_account`, stores it in the composer, and sets `allowFetch: false`.
+2. **Automatic module loading:** lets `addBatchedCalls` fetch required Move metadata; `allowFetch` defaults to `true`.
+
+The script never signs or submits a transaction.
 
 ## Prerequisites
 
 - Node.js 22 or later
-- npm or yarn
+- pnpm 10.11.0 or later
+- Network access to Aptos Testnet or Mainnet
 
-## Installation
+## Run
 
-1. Navigate to the example directory:
-```bash
-cd examples/nodejs
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-## Running the Example
-
-To run the example:
+From the repository root:
 
 ```bash
-tsx index.ts
+pnpm install
+pnpm build
+pnpm --filter example-nodejs start
 ```
 
-## What This Example Does
+The default configuration uses `0x1` as both sender and recipient on Testnet and transfers one octa. It is intentionally safe because the transaction is simulated only.
 
-This example demonstrates:
+## Configuration
 
-1. Fetching a module from the Aptos blockchain
-2. Building a transaction using the Script Composer SDK
-3. Simulating the transaction on the Aptos testnet
+Set environment variables before running to use different public account addresses or network settings:
 
-The example specifically:
-- Fetches the `aptos_account` module from the Aptos blockchain
-- Creates a transaction that attempts to transfer 1 APT from account `0x1` to itself
-- Simulates the transaction to see the expected outcome
+| Variable | Default | Description |
+| --- | --- | --- |
+| `APTOS_NETWORK` | `testnet` | `testnet` or `mainnet` |
+| `APTOS_SENDER` | `0x1` | Sender address used to build and simulate the transaction |
+| `APTOS_RECIPIENT` | sender address | Recipient address |
+| `APTOS_AMOUNT_OCTAS` | `1` | Positive integer transfer amount in octas |
 
-## Code Structure
+For example:
 
-- `index.ts`: Contains the main example code
-- `package.json`: Defines project dependencies
+```bash
+APTOS_SENDER=0x... APTOS_RECIPIENT=0x... APTOS_AMOUNT_OCTAS=1000 \
+  pnpm --filter example-nodejs start
+```
 
-## Dependencies
+## Expected output
 
-The example uses the following main dependencies:
-- `script-composer-sdk`: For building transactions
-- `@aptos-labs/ts-sdk`: For interacting with the Aptos blockchain
-- `@aptos-labs/script-composer-pack`: For transaction building utilities 
+A successful run prints one simulation summary for the preloaded module path and one for automatic module loading. Both should report `success: true` when using the default Testnet configuration.
+
+## Use this in an application
+
+Replace the transfer call with your Move entry functions, then build a transaction with `BuildScriptComposerTransaction`. The returned transaction is unsigned. Use `@aptos-labs/ts-sdk` to collect signatures and submit only after reviewing the payload and signer permissions.
