@@ -43,4 +43,19 @@ The output identifies each constructed transaction's secondary signer addresses 
 
 A fee payer is responsible for gas but does not occupy a `CallArgument.newSigner(...)` index. Signer index `0` is always the primary sender; secondary signers begin at index `1`.
 
-The example uses placeholder addresses and a transfer to `0x1`. Replace them with accounts and Move functions that match your application's authorization model before signing or submitting a transaction.
+## Simulating a multi-agent transaction
+
+To test a constructed transaction without submitting it, use the multi-agent simulation API from `@aptos-labs/ts-sdk` and provide the public keys for every required signer:
+
+```ts
+const result = await aptos.transaction.simulate.multiAgent({
+  transaction,
+  senderPublicKey,
+  secondarySignerPublicKeys,
+  feePayerPublicKey,
+});
+```
+
+See the [Aptos TypeScript SDK documentation](https://aptos.dev/en/build/sdks/ts-sdk) for the exact argument shape for your transaction type.
+
+The example uses placeholder addresses and a transfer to `0x1`. Replace them with accounts and Move functions that match your application's authorization model before signing, simulating, or submitting a transaction.

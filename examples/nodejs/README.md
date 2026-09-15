@@ -39,3 +39,8 @@ Expected output includes `simulate_result (cache)` and `simulate_result (fetch)`
 4. Sign and submit the returned transaction with `@aptos-labs/ts-sdk` only after reviewing the payload and required signer permissions.
 
 For an offline or controlled module-loading workflow, keep `allowFetch: false` and supply `moduleAbi` plus `moduleBytecodes`. For connected applications, omit the option or use `allowFetch: true`.
+
+## Learn more
+
+- [Repository README](../../README.md)
+- [Official Aptos Script Composer guide](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer)

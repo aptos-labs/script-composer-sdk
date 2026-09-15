@@ -2,15 +2,17 @@
 
 Compose multiple Aptos Move entry-function calls into a single script transaction.
 
-For full documentation, examples, and contribution information, see the [Script Composer SDK repository](https://github.com/aptos-labs/script-composer-sdk).
+For full documentation, examples, and contribution information, see the [Script Composer SDK repository](https://github.com/aptos-labs/script-composer-sdk). The official Aptos guide is at [aptos.dev](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer).
 
 ## Install
 
 ```bash
-pnpm add @aptos-labs/script-composer-sdk @aptos-labs/ts-sdk
+pnpm add @aptos-labs/script-composer-sdk @aptos-labs/ts-sdk @aptos-labs/script-composer-pack
 ```
 
 The package supports `@aptos-labs/ts-sdk` major versions 3 through 7.
+
+Browser applications also require the `buffer` peer dependency and a global `Buffer` polyfill before initializing the SDK. See the repository README for details.
 
 ## Build a transaction
 
@@ -35,4 +37,9 @@ const transaction = await BuildScriptComposerTransaction({
 
 `addBatchedCalls` automatically fetches missing Move module metadata by default. To work offline, set `options.allowFetch` to `false` and provide `moduleAbi` and `moduleBytecodes`.
 
-The returned transaction is unsigned. Sign and submit it with `@aptos-labs/ts-sdk`. Use `BuildScriptComposerMultiAgentTransaction` when secondary signers or a fee payer are required.
+For generic Move functions, pass concrete types through `typeArguments`. Returned `CallArgument` values from one call can be forwarded into later calls when Move ability rules allow it.
+
+The returned transaction is unsigned. Sign and submit it with `@aptos-labs/ts-sdk`.
+
+- Use `BuildScriptComposerMultiAgentTransaction` when secondary signers or a fee payer are required.
+- Use `BuildScriptComposerTransaction` with `withFeePayer: true` for a sponsored single-signer transaction.

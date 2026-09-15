@@ -3,7 +3,9 @@
 [![CI](https://github.com/aptos-labs/script-composer-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/aptos-labs/script-composer-sdk/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@aptos-labs/script-composer-sdk)](https://www.npmjs.com/package/@aptos-labs/script-composer-sdk)
 
-Compose multiple Aptos Move entry-function calls into one script transaction. The SDK builds on [`@aptos-labs/ts-sdk`](https://www.npmjs.com/package/@aptos-labs/ts-sdk) and the Script Composer pack, and supports single-signer, multi-agent, and fee-payer transactions.
+Compose multiple Aptos Move entry-function calls into one script transaction. The SDK builds on [`@aptos-labs/ts-sdk`](https://www.npmjs.com/package/@aptos-labs/ts-sdk) and [`@aptos-labs/script-composer-pack`](https://www.npmjs.com/package/@aptos-labs/script-composer-pack) (WASM), and supports single-signer, multi-agent, and fee-payer transactions.
+
+For the official Aptos guide, see [Invoke chains of Move calls with Dynamic Script Composer](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer).
 
 ## Why use it?
 
@@ -12,10 +14,24 @@ A transaction normally invokes one entry function. Script Composer lets an appli
 ## Install
 
 ```bash
-pnpm add @aptos-labs/script-composer-sdk @aptos-labs/ts-sdk
+pnpm add @aptos-labs/script-composer-sdk @aptos-labs/ts-sdk @aptos-labs/script-composer-pack
 ```
 
 The SDK supports `@aptos-labs/ts-sdk` major versions 3 through 7. Use Node.js 22 or a current LTS release for this repository and its examples.
+
+Browser applications also need the `buffer` peer dependency and a global polyfill before initializing the SDK:
+
+```bash
+pnpm add buffer
+```
+
+```ts
+import { Buffer } from 'buffer';
+
+(window as typeof window & { Buffer: typeof Buffer }).Buffer = Buffer;
+```
+
+The React and Next.js examples in this repository follow this pattern.
 
 ## Quick start
 
@@ -56,6 +72,18 @@ To submit a transaction, sign the returned transaction with the appropriate acco
 
 For offline or controlled environments, set `options.allowFetch` to `false` and provide both `moduleAbi` and `moduleBytecodes`. You can also preload modules with `getModuleInner` and `composer.storeModule` as shown in the Node example.
 
+### Generic Move functions and `typeArguments`
+
+When a Move entry function is generic, pass concrete type tags through `typeArguments`. The composer also loads any modules required by those type tags:
+
+```ts
+await composer.addBatchedCalls({
+  function: '0x1::coin::transfer',
+  typeArguments: ['0x1::aptos_coin::AptosCoin'],
+  functionArguments: [CallArgument.newSigner(0), recipient, 1_000],
+});
+```
+
 ### Connecting calls with returned values
 
 `addBatchedCalls` returns `CallArgument[]`. Pass a returned item into a later call's `functionArguments` to compose dependent operations without leaving the transaction:
@@ -68,12 +96,20 @@ await composer.addBatchedCalls({
 });
 ```
 
+Move ability rules still apply at composition time. Values without `drop` must be consumed by a later call, and values without `copy` can only be forwarded once. See the [official Script Composer guide](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer) for examples.
+
 ### Signers, multi-agent transactions, and fee payers
 
 - `CallArgument.newSigner(0)` refers to the primary sender. Secondary signers are indexed starting at `1`.
 - Use `BuildScriptComposerTransaction` for a normal, single-signer transaction.
 - Use `BuildScriptComposerMultiAgentTransaction` when calls require secondary signers and/or a fee payer. It returns a transaction that each required account must sign before submission.
+- For a sponsored transaction with only the primary sender and no secondary signers, you can also pass `withFeePayer: true` to `BuildScriptComposerTransaction`.
 - A fee payer pays gas; it is not an additional Move-function signer unless the Move call itself requires one.
+
+### Simulating before submission
+
+- Single-signer transactions: `aptos.transaction.simulate.simple({ transaction })`
+- Multi-agent transactions: `aptos.transaction.simulate.multiAgent({ transaction, ... })` with the public keys for each required signer
 
 ## Examples
 
@@ -81,7 +117,7 @@ await composer.addBatchedCalls({
 | --- | --- | --- |
 | [Node.js](examples/nodejs) | Auto-fetch and preloaded-module composition, then simulation on Testnet | `pnpm --filter example-nodejs start` |
 | [Multi-agent Node.js](examples/multi-agent-nodejs) | Secondary signers and fee-payer transaction construction | `pnpm --filter example-multi-agent-nodejs start` |
-| [React](examples/react-project) | Browser UI for composing transactions | `pnpm --filter react-project dev` |
+| [React](examples/react-project) | Browser UI for composing and simulating transactions | `pnpm --filter react-project dev` |
 | [Next.js](examples/nextjs-project) | Browser UI including multi-agent flows | `pnpm --filter nextjs-project dev` |
 
 Examples construct or simulate transactions only unless their documentation explicitly says otherwise. Review function arguments, account addresses, and network configuration before adapting an example to submit real transactions.
@@ -106,7 +142,9 @@ This project uses [Changesets](https://github.com/changesets/changesets). Change
 pnpm changeset
 ```
 
-Merging changesets to `main` creates or updates a version PR; merging that PR publishes the package through the repository release workflow.
+Merging changesets to `main` creates or updates a version PR; merging that PR publishes the package through [`.github/workflows/release.yml`](.github/workflows/release.yml).
+
+Maintainers: configure the GitHub App (`APTOS_LABS_BOT_APP_ID`, `APTOS_LABS_BOT_APP_PRIVATE_KEY`) and npm Trusted Publisher for that workflow before the first automated release.
 
 ## Support and security
 
