@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@aptos-labs/script-composer-sdk": "workspace:*",
-    "@aptos-labs/ts-sdk": "^7.1.0",
+    "@aptos-labs/ts-sdk": "^7.3.0",
     "@keyv/offline": "^4.0.2",
     "next": "^16.3.3",
     "prism-react-renderer": "^2.4.1",

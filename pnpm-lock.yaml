@@ -27,7 +27,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^7.1.0
+        specifier: ^7.3.0
         version: 7.3.0
     devDependencies:
       tsx:
@@ -43,7 +43,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^7.1.0
+        specifier: ^7.3.0
         version: 7.3.0
       '@keyv/offline':
         specifier: ^4.0.2
@@ -95,7 +95,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^7.1.0
+        specifier: ^7.3.0
         version: 7.3.0
     devDependencies:
       tsx:
@@ -111,7 +111,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdk
       '@aptos-labs/ts-sdk':
-        specifier: ^7.1.0
+        specifier: ^7.3.0
         version: 7.3.0
       buffer:
         specifier: ^6.0.3
