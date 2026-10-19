@@ -1,121 +1,44 @@
-# Script Composer Next.js Example
+# Next.js example
 
-This is an example project demonstrating how to use Script Composer with Next.js. This project showcases the integration of Script Composer in a modern Next.js application.
+A browser UI built with Next.js that composes Aptos transactions with the Script Composer SDK and simulates them on Testnet. The main demo lives in `src/app/components/ScriptComposer.tsx`.
+
+The UI simulates transactions only. It does not sign or submit them.
 
 ## Prerequisites
 
 - Node.js 22 or later
-- pnpm (recommended), npm, or yarn
+- pnpm 10.11.0 or later
+- Network access to Aptos Testnet
 
-## Installation
+## Run
 
-### Using pnpm (Recommended)
+From the repository root:
 
 ```bash
-# Install dependencies
 pnpm install
+pnpm build
+pnpm --filter nextjs-project dev
 ```
 
-### Using npm
-
-```bash
-# Install dependencies
-npm install
-```
-
-### Using yarn
-
-```bash
-# Install dependencies
-yarn install
-```
-
-## Development
-
-To start the development server:
-
-### Using pnpm
+Or, from this directory after installing workspace dependencies from the repository root:
 
 ```bash
 pnpm dev
 ```
 
-### Using npm
+The development server starts at `http://localhost:3000`.
+
+## Browser setup
+
+Browser applications need the `buffer` peer dependency. Install the SDK and its peers in your own app with:
 
 ```bash
-npm run dev
+pnpm add @aptos-labs/script-composer-sdk @aptos-labs/ts-sdk @aptos-labs/script-composer-pack buffer
 ```
 
-### Using yarn
+If your bundler does not provide Node globals automatically, polyfill `Buffer` before initializing the SDK, as shown in the [React example](../react-project/README.md).
 
-```bash
-yarn dev
-```
+## Learn more
 
-The development server will start at `http://localhost:3000`.
-
-## Building for Production
-
-To create a production build:
-
-### Using pnpm
-
-```bash
-pnpm build
-```
-
-### Using npm
-
-```bash
-npm run build
-```
-
-### Using yarn
-
-```bash
-yarn build
-```
-
-## Running Production Build
-
-After building, you can start the production server:
-
-### Using pnpm
-
-```bash
-pnpm start
-```
-
-### Using npm
-
-```bash
-npm start
-```
-
-### Using yarn
-
-```bash
-yarn start
-```
-
-## Project Structure
-
-- `pages/` - Next.js pages and API routes
-- `components/` - React components
-- `public/` - Static assets
-- `styles/` - CSS and styling files
-
-## Features
-
-- Next.js 13+ with App Router
-- Script Composer integration
-- TypeScript support
-- Modern development setup
-
-## Learn More
-
-To learn more about Script Composer, check out the [documentation](https://github.com/wgb5445/script-composer-sdk).
-
-## License
-
-MIT
+- [Repository README](../../README.md)
+- [Official Aptos Script Composer guide](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer)

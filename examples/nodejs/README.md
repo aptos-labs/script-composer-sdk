@@ -50,3 +50,8 @@ A successful run prints one simulation summary for the preloaded module path and
 ## Use this in an application
 
 Replace the transfer call with your Move entry functions, then build a transaction with `BuildScriptComposerTransaction`. The returned transaction is unsigned. Use `@aptos-labs/ts-sdk` to collect signatures and submit only after reviewing the payload and signer permissions.
+
+## Learn more
+
+- [Repository README](../../README.md)
+- [Official Aptos Script Composer guide](https://aptos.dev/build/sdks/ts-sdk/building-transactions/script-composer)
