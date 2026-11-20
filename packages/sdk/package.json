@@ -34,7 +34,9 @@
     "package.json"
   ],
   "scripts": {
-    "build": "tsup --config tsup.config.ts",
+    "build": "tsup --config tsup.config.ts && pnpm build:declarations && pnpm typecheck",
+    "build:declarations": "tsc -p tsconfig.build.json && node -e \"import('node:fs').then(({copyFileSync})=>copyFileSync('dist/index.d.ts','dist/index.d.cts'))\"",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "prepublish": "pnpm build",
@@ -66,12 +68,13 @@
     "@eslint/js": "9.36.0",
     "@typescript-eslint/eslint-plugin": "8.44.1",
     "@typescript-eslint/parser": "8.44.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "9.36.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
     "prettier": "3.6.2",
     "tsup": "8.5.0",
-    "typescript": "5.8.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vitest": "4.1.11"
   },
   "homepage": "https://github.com/aptos-labs/script-composer-sdk#readme",
