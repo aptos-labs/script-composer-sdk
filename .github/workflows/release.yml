@@ -6,53 +6,195 @@ on:
       - main
   workflow_dispatch:
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build
-    permissions:
-      id-token: write
-      actions: write
-      pull-requests: write
-      contents: write
+  version-pr:
+    name: Update Version Packages PR
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.hasChangesets }}
+      has_unpublished: ${{ steps.unpublished.outputs.has_unpublished }}
+      dist_tag: ${{ steps.unpublished.outputs.dist_tag }}
     steps:
       - name: Authenticate as Aptos Labs Bot
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: authenticate
         with:
           app-id: ${{ vars.APTOS_LABS_BOT_APP_ID }}
           private-key: ${{ secrets.APTOS_LABS_BOT_APP_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.x
-          registry-url: https://registry.npmjs.org
-
-      - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+          node-version: "24.x"
 
       - name: Install pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           run_install: false
 
-      - name: Install global dependencies
+      - name: Setup safe-chain (supply-chain guard)
+        uses: aptos-labs/actions/aikidosec-safe-chain@a4b79b914b919a798ff102ae39e2a5e9d67dd946 # main
+
+      - name: Allow first-party @aptos-labs/* through safe-chain age gate
+        run: echo "SAFE_CHAIN_MINIMUM_PACKAGE_AGE_EXCLUSIONS=@aptos-labs/*" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build global project
-        run: pnpm run build
-
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create or Update Version Packages PR
         id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: pnpm run publish-packages
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         env:
           GITHUB_TOKEN: ${{ steps.authenticate.outputs.token }}
-          NPM_CONFIG_PROVENANCE: true
+
+      - name: Check whether SDK version is unpublished on npm
+        id: unpublished
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "push" && -n "$BEFORE_SHA" && "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+            if [ -z "$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA" -- 'packages/sdk/package.json')" ]; then
+              echo "packages/sdk/package.json did not change in this push; skipping publish check."
+              echo "has_unpublished=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          node <<'EOF'
+          const fs = require("node:fs");
+          const pkg = JSON.parse(fs.readFileSync("packages/sdk/package.json", "utf8"));
+          const url = `https://registry.npmjs.org/${encodeURIComponent(pkg.name)}/${encodeURIComponent(pkg.version)}`;
+
+          fetch(url)
+            .then((res) => {
+              const unpublished = res.status === 404;
+              if (!unpublished && !res.ok) {
+                throw new Error(`Unexpected npm status ${res.status} for ${url}`);
+              }
+              const distTag = pkg.version.includes("-") ? "next" : "latest";
+              console.log(`${pkg.name}@${pkg.version}: unpublished=${unpublished}, dist_tag=${distTag}`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `has_unpublished=${unpublished}\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `dist_tag=${distTag}\n`);
+            })
+            .catch((err) => {
+              console.error(err);
+              process.exit(1);
+            });
+          EOF
+
+  build:
+    name: Build, test, and pack
+    needs: version-pr
+    if: needs.version-pr.outputs.has_changesets == 'false' && needs.version-pr.outputs.has_unpublished == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
+
+      - name: Setup safe-chain (supply-chain guard)
+        uses: aptos-labs/actions/aikidosec-safe-chain@a4b79b914b919a798ff102ae39e2a5e9d67dd946 # main
+
+      - name: Allow first-party @aptos-labs/* through safe-chain age gate
+        run: echo "SAFE_CHAIN_MINIMUM_PACKAGE_AGE_EXCLUSIONS=@aptos-labs/*" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build SDK
+        run: pnpm --filter @aptos-labs/script-composer-sdk build
+
+      - name: Run SDK tests
+        run: pnpm --filter @aptos-labs/script-composer-sdk test
+
+      - name: Pack SDK tarball
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/pack"
+          pnpm --dir packages/sdk pack --pack-destination "${RUNNER_TEMP}/pack"
+          ls -la "${RUNNER_TEMP}/pack"
+
+      - name: Upload packed tarball
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-pack
+          path: ${{ runner.temp }}/pack/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  stage-publish:
+    name: Stage SDK on npm
+    needs: [version-pr, build]
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download packed tarball
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: npm-pack
+          path: ./pack
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: "12.21.0"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          registry-url: "https://registry.npmjs.org"
+
+      # Stages the pre-built tarball via npm OIDC trusted publishing. Maintainers
+      # finalize publication with 2FA via `pnpm stage approve`.
+      - name: Stage tarball on npm (OIDC trusted publishing)
+        env:
+          DIST_TAG: ${{ needs.version-pr.outputs.dist_tag }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          tarballs=(./pack/*.tgz)
+          if [ "${#tarballs[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly 1 tarball in ./pack, found ${#tarballs[@]}"
+            exit 1
+          fi
+          pnpm stage publish "${tarballs[0]}" \
+            --provenance \
+            --access public \
+            --tag "${DIST_TAG}" \
+            --no-git-checks
