@@ -4,7 +4,12 @@
   "description": "Compose multiple Aptos Move calls into a single transaction",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aptos-labs/script-composer-sdk"
+    "url": "https://github.com/aptos-labs/script-composer-sdk",
+    "directory": "packages/sdk"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
