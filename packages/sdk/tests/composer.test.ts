@@ -78,10 +78,11 @@ beforeAll(async () => {
     if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('getaddrinfo')) {
       throw new Error(
         'Network error: Could not connect to Aptos Testnet. ' +
-          'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.'
+          'Please check your internet connection and ensure api.testnet.aptoslabs.com is accessible.',
+        { cause: error }
       );
     }
-    throw new Error(`Failed to load test modules: ${errorMessage}`);
+    throw new Error(`Failed to load test modules: ${errorMessage}`, { cause: error });
   }
 });
 
