@@ -20,3 +20,16 @@ overrides:
   '@babel/core@<=7.29.0': '>=7.29.6'
   'brace-expansion@<1.1.18': '>=1.1.18'
   'brace-expansion@>=2.0.0 <2.1.4': '>=2.1.4'
+
+minimumReleaseAgeExclude:
+  - '@typescript-eslint/eslint-plugin@8.74.0'
+  - '@typescript-eslint/parser@8.74.0'
+  - '@typescript-eslint/project-service@8.74.0'
+  - '@typescript-eslint/scope-manager@8.74.0'
+  - '@typescript-eslint/tsconfig-utils@8.74.0'
+  - '@typescript-eslint/type-utils@8.74.0'
+  - '@typescript-eslint/types@8.74.0'
+  - '@typescript-eslint/typescript-estree@8.74.0'
+  - '@typescript-eslint/utils@8.74.0'
+  - '@typescript-eslint/visitor-keys@8.74.0'
+  - typescript-eslint@8.74.0
