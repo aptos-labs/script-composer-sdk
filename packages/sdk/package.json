@@ -65,17 +65,17 @@
   "devDependencies": {
     "@aptos-labs/aptos-dynamic-transaction-composer": "^0.1.8",
     "@aptos-labs/script-composer-pack": "^0.2.5",
-    "@eslint/js": "9.36.0",
-    "@typescript-eslint/eslint-plugin": "8.44.1",
-    "@typescript-eslint/parser": "8.44.1",
+    "@eslint/js": "9.39.5",
+    "@typescript-eslint/eslint-plugin": "8.73.0",
+    "@typescript-eslint/parser": "8.73.0",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "eslint": "9.36.0",
+    "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-prettier": "5.5.4",
-    "prettier": "3.6.2",
-    "tsup": "8.5.0",
+    "eslint-plugin-prettier": "5.5.7",
+    "prettier": "3.10.1",
+    "tsup": "8.5.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   },
   "homepage": "https://github.com/aptos-labs/script-composer-sdk#readme",
   "bugs": {
