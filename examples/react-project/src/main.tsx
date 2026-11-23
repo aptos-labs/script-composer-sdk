@@ -5,7 +5,7 @@ import './i18n'
 import App from './App.tsx'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { Buffer } from 'buffer';
-(window as any).Buffer = Buffer;
+(window as unknown as { Buffer: typeof Buffer }).Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

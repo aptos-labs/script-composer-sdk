@@ -1,4 +1,5 @@
 import { AptosConfig, Network, Aptos } from '@aptos-labs/ts-sdk'
+import type { UserTransactionResponse } from '@aptos-labs/ts-sdk'
 import { BuildScriptComposerTransaction, CallArgument, getModuleInner } from "@aptos-labs/script-composer-sdk"
 import { useState, useMemo } from 'react'
 import { Highlight } from 'prism-react-renderer'
@@ -22,7 +23,7 @@ function App() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('simple');
   const [showModal, setShowModal] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [simulationResult, setSimulationResult] = useState<UserTransactionResponse[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCode, setShowCode] = useState(false);
@@ -122,7 +123,7 @@ async function buildAndSimulateTransaction() {
       // Convert APT to Octas (1 APT = 10^8 Octas)
       const amountInOctas = aptToOctas(amountNum);
 
-      let aptos_account_module: any;
+      let aptos_account_module: Awaited<ReturnType<typeof getModuleInner>> | undefined;
       
       if (useCache) {
         // Use cache mode - fetch and store module
@@ -172,9 +173,9 @@ async function buildAndSimulateTransaction() {
       setSimulationResult(simulate_result);
       setShowModal(true);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error:', err);
-      setError(err?.message || t('errors.simulationFailed'));
+      setError((err instanceof Error ? err.message : null) || t('errors.simulationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -377,7 +378,7 @@ async function buildAndSimulateTransaction() {
 
         {showModal && simulationResult && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={handleModalClick}
           >
             <div

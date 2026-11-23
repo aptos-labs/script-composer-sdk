@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 
 const normalizeLanguage = (lang: string): 'en' | 'zh' => {
   if (lang.startsWith('zh')) return 'zh';
@@ -14,32 +14,34 @@ const languages = [
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState<'en' | 'zh'>(() => normalizeLanguage(i18n.language));
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      i18n.on('languageChanged', onStoreChange);
+      return () => {
+        i18n.off('languageChanged', onStoreChange);
+      };
+    },
+    [i18n]
+  );
+  const currentLang = useSyncExternalStore(
+    subscribe,
+    () => normalizeLanguage(i18n.language),
+    () => normalizeLanguage(i18n.language)
+  );
 
   const handleLanguageChange = (langCode: 'en' | 'zh') => {
     i18n.changeLanguage(langCode);
-    setCurrentLang(langCode);
     setIsOpen(false);
   };
 
-  // Normalize language on mount and listen to language changes
+  // Normalize language on mount (e.g. zh-CN -> zh)
   useEffect(() => {
     const normalized = normalizeLanguage(i18n.language);
     if (i18n.language !== normalized) {
       i18n.changeLanguage(normalized);
-    } else {
-      setCurrentLang(normalized);
     }
-
-    const handleLanguageChanged = (lng: string) => {
-      setCurrentLang(normalizeLanguage(lng));
-    };
-
-    i18n.on('languageChanged', handleLanguageChanged);
-    return () => {
-      i18n.off('languageChanged', handleLanguageChanged);
-    };
   }, [i18n]);
 
   // Close dropdown when clicking outside (only when open)

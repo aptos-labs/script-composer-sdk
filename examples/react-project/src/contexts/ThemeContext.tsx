@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
@@ -12,57 +12,46 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  if (theme === 'dark') {
+    root.setAttribute('data-theme', 'dark');
+    root.classList.add('dark');
+  } else {
+    root.setAttribute('data-theme', 'light');
+    root.classList.remove('dark');
+  }
+}
 
-  useEffect(() => {
-    try {
-      // Check localStorage first
-      const savedTheme = localStorage.getItem('theme') as Theme | null;
-      
-      // If no saved theme, check system preference
-      let initialTheme: Theme = 'light';
-      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-        initialTheme = savedTheme;
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        initialTheme = prefersDark ? 'dark' : 'light';
-      }
-      
-      setThemeState(initialTheme);
-      
-      // Apply theme immediately before React renders
-      const root = document.documentElement;
-      if (initialTheme === 'dark') {
-        root.setAttribute('data-theme', 'dark');
-        root.classList.add('dark');
-      } else {
-        root.setAttribute('data-theme', 'light');
-        root.classList.remove('dark');
-      }
-    } catch (error) {
-      console.error('Error initializing theme:', error);
-    } finally {
-      setMounted(true);
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light';
+
+  try {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+      return savedTheme;
     }
-  }, []);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  } catch (error) {
+    console.error('Error initializing theme:', error);
+    return 'light';
+  }
+}
+
+const subscribe = () => () => {};
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const storedTheme = useSyncExternalStore(subscribe, getInitialTheme, () => 'light' as Theme);
+  const [themeOverride, setThemeState] = useState<Theme | null>(null);
+  const theme = themeOverride ?? storedTheme;
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     try {
-      // Apply theme to document root immediately
-      const root = document.documentElement;
-      if (theme === 'dark') {
-        root.setAttribute('data-theme', 'dark');
-        root.classList.add('dark');
-      } else {
-        root.setAttribute('data-theme', 'light');
-        root.classList.remove('dark');
-      }
-      
-      // Save to localStorage
+      applyTheme(theme);
       localStorage.setItem('theme', theme);
     } catch (error) {
       console.error('Error applying theme:', error);
@@ -70,38 +59,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      // Apply immediately for better UX
-      try {
-        const root = document.documentElement;
-        if (newTheme === 'dark') {
-          root.setAttribute('data-theme', 'dark');
-          root.classList.add('dark');
-        } else {
-          root.setAttribute('data-theme', 'light');
-          root.classList.remove('dark');
-        }
-        localStorage.setItem('theme', newTheme);
-      } catch (error) {
-        console.error('Error toggling theme:', error);
-      }
-      return newTheme;
-    });
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setThemeState(newTheme);
+    try {
+      applyTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
+    } catch (error) {
+      console.error('Error toggling theme:', error);
+    }
   };
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    // Apply immediately
     try {
-      const root = document.documentElement;
-      if (newTheme === 'dark') {
-        root.setAttribute('data-theme', 'dark');
-        root.classList.add('dark');
-      } else {
-        root.setAttribute('data-theme', 'light');
-        root.classList.remove('dark');
-      }
+      applyTheme(newTheme);
       localStorage.setItem('theme', newTheme);
     } catch (error) {
       console.error('Error setting theme:', error);
