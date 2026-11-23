@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useSyncExternalStore, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -46,17 +46,13 @@ function getInitialTheme(): Theme {
   }
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+const subscribe = () => () => {};
 
-  // Initialize theme on mount
-  useEffect(() => {
-    const initialTheme = getInitialTheme();
-    setThemeState(initialTheme);
-    applyTheme(initialTheme);
-    setMounted(true);
-  }, []);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const storedTheme = useSyncExternalStore(subscribe, getInitialTheme, () => 'light' as Theme);
+  const [themeOverride, setThemeState] = useState<Theme | null>(null);
+  const theme = themeOverride ?? storedTheme;
 
   // Apply theme when it changes (after mount)
   useEffect(() => {
@@ -71,16 +67,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      applyTheme(newTheme);
-      try {
-        localStorage.setItem('theme', newTheme);
-      } catch (error) {
-        console.error('Error saving theme:', error);
-      }
-      return newTheme;
-    });
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setThemeState(newTheme);
+    applyTheme(newTheme);
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (error) {
+      console.error('Error saving theme:', error);
+    }
   };
 
   const setTheme = (newTheme: Theme) => {

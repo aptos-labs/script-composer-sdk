@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useSyncExternalStore, ReactNode } from 'react';
 import enTranslations from './locales/en.json';
 import zhTranslations from './locales/zh.json';
 
@@ -25,28 +25,29 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
+function getInitialLocale(): Locale {
+  if (typeof window === 'undefined') return 'en';
+
+  const browserLang = navigator.language.toLowerCase();
+  let detectedLocale: Locale = 'en';
+
+  if (browserLang.startsWith('zh')) {
+    detectedLocale = 'zh';
+  }
+
+  const savedLocale = localStorage.getItem('i18nextLng') as Locale | null;
+  return savedLocale && (savedLocale === 'en' || savedLocale === 'zh')
+    ? savedLocale
+    : detectedLocale;
+}
+
+const subscribe = () => () => {};
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>('en');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Detect browser language
-    const browserLang = navigator.language.toLowerCase();
-    let detectedLocale: Locale = 'en';
-    
-    if (browserLang.startsWith('zh')) {
-      detectedLocale = 'zh';
-    }
-
-    // Check localStorage
-    const savedLocale = localStorage.getItem('i18nextLng') as Locale | null;
-    const initialLocale = savedLocale && (savedLocale === 'en' || savedLocale === 'zh') 
-      ? savedLocale 
-      : detectedLocale;
-
-    setLocale(initialLocale);
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const detectedLocale = useSyncExternalStore(subscribe, getInitialLocale, () => 'en' as Locale);
+  const [localeOverride, setLocale] = useState<Locale | null>(null);
+  const locale = localeOverride ?? detectedLocale;
 
   const changeLanguage = (newLocale: Locale) => {
     setLocale(newLocale);
