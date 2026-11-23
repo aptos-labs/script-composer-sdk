@@ -50,9 +50,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme on mount
+  // Initialize theme on mount (deferred to avoid SSR hydration mismatch)
   useEffect(() => {
     const initialTheme = getInitialTheme();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only init from localStorage/matchMedia
     setThemeState(initialTheme);
     applyTheme(initialTheme);
     setMounted(true);

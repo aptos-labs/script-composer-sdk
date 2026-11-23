@@ -1,4 +1,5 @@
 import { AptosConfig, Network, Aptos } from '@aptos-labs/ts-sdk'
+import type { MoveModuleBytecode } from '@aptos-labs/ts-sdk'
 import { BuildScriptComposerTransaction, CallArgument, getModuleInner } from "@aptos-labs/script-composer-sdk"
 import { useState, useMemo } from 'react'
 import { Highlight } from 'prism-react-renderer'
@@ -9,6 +10,7 @@ import MultiAgentDemo from './components/MultiAgentDemo'
 import ThemeToggle from './components/ThemeToggle'
 
 type ViewType = 'simple' | 'multiAgent';
+type SimulationResult = Awaited<ReturnType<Aptos['transaction']['simulate']['simple']>>;
 
 /**
  * Converts APT (decimal) to Octas (integer)
@@ -22,7 +24,7 @@ function App() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<ViewType>('simple');
   const [showModal, setShowModal] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCode, setShowCode] = useState(false);
@@ -122,7 +124,7 @@ async function buildAndSimulateTransaction() {
       // Convert APT to Octas (1 APT = 10^8 Octas)
       const amountInOctas = aptToOctas(amountNum);
 
-      let aptos_account_module: any;
+      let aptos_account_module: MoveModuleBytecode | undefined;
       
       if (useCache) {
         // Use cache mode - fetch and store module
@@ -172,9 +174,9 @@ async function buildAndSimulateTransaction() {
       setSimulationResult(simulate_result);
       setShowModal(true);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error:', err);
-      setError(err?.message || t('errors.simulationFailed'));
+      setError(err instanceof Error ? err.message : t('errors.simulationFailed'));
     } finally {
       setIsLoading(false);
     }

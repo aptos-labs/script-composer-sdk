@@ -44,6 +44,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       ? savedLocale 
       : detectedLocale;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only init from localStorage/navigator
     setLocale(initialLocale);
     setMounted(true);
   }, []);
