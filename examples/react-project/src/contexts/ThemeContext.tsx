@@ -30,6 +30,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         initialTheme = prefersDark ? 'dark' : 'light';
       }
       
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only init from localStorage/matchMedia
       setThemeState(initialTheme);
       
       // Apply theme immediately before React renders

@@ -28,8 +28,6 @@ export default function LanguageSwitcher() {
     const normalized = normalizeLanguage(i18n.language);
     if (i18n.language !== normalized) {
       i18n.changeLanguage(normalized);
-    } else {
-      setCurrentLang(normalized);
     }
 
     const handleLanguageChanged = (lng: string) => {

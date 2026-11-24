@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "@aptos-labs/script-composer-sdk": "workspace:*",
-    "@aptos-labs/ts-sdk": "^7.3.0"
+    "@aptos-labs/ts-sdk": "^7.5.0"
   },
   "devDependencies": {
-    "tsx": "^4.20.6",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
 }
