@@ -13,7 +13,7 @@
     "@aptos-labs/script-composer-sdk": "workspace:*",
     "@aptos-labs/ts-sdk": "^7.3.0",
     "buffer": "^6.0.3",
-    "i18next": "^25.8.0",
+    "i18next": "^26.3.4",
     "i18next-browser-languagedetector": "^8.2.0",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.1.1",
